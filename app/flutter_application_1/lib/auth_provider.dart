@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'dart:convert';
 
 class AuthProvider with ChangeNotifier {
   String? _token;
@@ -7,6 +8,17 @@ class AuthProvider with ChangeNotifier {
   final storage = FlutterSecureStorage();
 
   String? get token => _token;
+  // decode jwt token to get the paylod
+  String? get getUsername {
+    if (_token == null) return null;
+    final parts = _token!.split('.');
+    if (parts.length != 3) return null;
+    final payload = parts[2];
+    final String normalized = base64Url.normalize(payload);
+    final String resp = utf8.decode(base64Url.decode(normalized));
+    final obj = json.decode(resp);
+    return obj['username'];
+  }
 
   bool get isAuthenticated => _token != null;
 
