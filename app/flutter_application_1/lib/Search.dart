@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/settings.dart';
 
 class SearchPage extends StatelessWidget {
   @override
@@ -10,7 +11,8 @@ class SearchPage extends StatelessWidget {
           IconButton(
               icon: Icon(Icons.settings),
               onPressed: () {
-                //open settings page
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (builder) => SettingsPage()));
               })
         ],
       ),
