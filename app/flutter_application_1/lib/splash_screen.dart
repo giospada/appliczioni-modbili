@@ -1,7 +1,9 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/home.dart';
 import 'package:flutter_application_1/home.dart';
 import 'dart:math';
+
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
@@ -21,7 +23,8 @@ class SpringCurve extends Curve {
   }
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   AnimationController? _controller;
   Animation<double>? _animation;
 
@@ -29,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: kDebugMode ? 0 : 4),
       vsync: this,
     )..forward();
     _animation = CurvedAnimation(parent: _controller!, curve: SpringCurve());
@@ -59,7 +62,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       body: Center(
         child: ScaleTransition(
           scale: _animation!,
-          child: Image.asset('assets/images/logo.png',height: 100,width: 100,), // Your logo here
+          child: Image.asset(
+            'assets/images/logo.png',
+            height: 100,
+            width: 100,
+          ), // Your logo here
         ),
       ),
     );

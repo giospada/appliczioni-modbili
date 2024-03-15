@@ -13,11 +13,11 @@ class AuthProvider with ChangeNotifier {
     if (_token == null) return null;
     final parts = _token!.split('.');
     if (parts.length != 3) return null;
-    final payload = parts[2];
+    final payload = parts[1];
     final String normalized = base64Url.normalize(payload);
     final String resp = utf8.decode(base64Url.decode(normalized));
     final obj = json.decode(resp);
-    return obj['username'];
+    return obj['sub'];
   }
 
   bool get isAuthenticated => _token != null;

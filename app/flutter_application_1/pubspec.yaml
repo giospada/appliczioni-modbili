@@ -39,6 +39,7 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   http: ^1.2.1
   provider: ^6.1.2
+  open_street_map_search_and_pick: ^0.1.1
 
 dev_dependencies:
   flutter_test:
