@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/activity_card.dart';
 import 'package:flutter_application_1/new_activity.dart';
 import 'package:flutter_application_1/settings.dart';
 import 'package:provider/provider.dart';
@@ -10,10 +11,43 @@ class SearchPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Search'),
       ),
-      body: Center(
-        child: Text('Search Page'),
-      ),
+      body: ActivityCardWidget(),
       drawerEnableOpenDragGesture: true,
+      bottomNavigationBar: BottomAppBar(
+        child: BottomAppBar(
+          child: Row(
+            children: <Widget>[
+              IconButton(
+                tooltip: 'Open popup menu',
+                icon: const Icon(Icons.more_vert),
+                onPressed: () {
+                  final SnackBar snackBar = SnackBar(
+                    content: const Text('Yay! A SnackBar!'),
+                    action: SnackBarAction(
+                      label: 'Undo',
+                      onPressed: () {},
+                    ),
+                  );
+
+                  // Find the ScaffoldMessenger in the widget tree
+                  // and use it to show a SnackBar.
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                },
+              ),
+              IconButton(
+                tooltip: 'Search',
+                icon: const Icon(Icons.search),
+                onPressed: () {},
+              ),
+              IconButton(
+                tooltip: 'Favorite',
+                icon: const Icon(Icons.favorite),
+                onPressed: () {},
+              ),
+            ],
+          ),
+        ),
+      ),
       drawer: Drawer(
         child: ListView(
           children: [

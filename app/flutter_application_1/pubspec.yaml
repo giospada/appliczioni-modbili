@@ -40,6 +40,7 @@ dependencies:
   http: ^1.2.1
   provider: ^6.1.2
   open_street_map_search_and_pick: ^0.1.1
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -66,6 +67,18 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/logo.png
+    - assets/svg/basketball.svg
+    - assets/svg/football.svg
+    - assets/svg/online_calendar.svg  
+    - assets/svg/sign_up.svg
+    - assets/svg/best_place.svg  
+    - assets/svg/login.svg          
+    - assets/svg/running.svg     
+    - assets/svg/time_management.svg
+    - assets/svg/done.svg        
+    - assets/svg/navigation.svg     
+    - assets/svg/settings_tab.svg
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

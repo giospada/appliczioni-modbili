@@ -4,9 +4,9 @@ import 'package:flex_color_scheme/flex_color_scheme.dart';
 ThemeData createLightTheme() {
   return FlexThemeData.light(
     colors: const FlexSchemeColor(
-      primary: Color(0xff065808),
+      primary: Color(0xFF065808),
       primaryContainer: Color(0xff9ee29f),
-      secondary: Color(0xff365b37),
+      secondary: Color.fromRGBO(54, 91, 55, 1),
       secondaryContainer: Color(0xffaebdaf),
       tertiary: Color(0xff2c7e2e),
       tertiaryContainer: Color(0xffb8e6b9),

@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List,Optional
 import  crud, models, schemas, database, auth
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
@@ -67,7 +67,11 @@ def create_activity(activity: schemas.ActivityCreate, db: Session = Depends(get_
     return crud.create_activity(db=db, activity=activity, username=token_data.username).toActivityBase()
 
 @app.get("/activities/search", response_model=List[str])
-def search_for_activities(sport: str, level: str, price: int, long: float, lat: float, radius: int, db: Session = Depends(get_db)):
+def search_for_activities(
+        sport: Optional[str] = None, level: Optional[str] = None,
+        price: Optional[int] = None, long: Optional[float] = None,
+        lat: Optional[float] = None, radius: Optional[int] = None,
+        db: Session = Depends(get_db)):
     activities = crud.search_activities(db, sport, level, price, long, lat, radius)
     return [activity.id for activity in activities]
 

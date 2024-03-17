@@ -1,7 +1,9 @@
+from typing import Optional
 from sqlalchemy.orm import Session
 import models, schemas, auth
 from fastapi import HTTPException, status
 from datetime import datetime, timedelta
+import math
 
 def get_user_by_username(db: Session, username: str):
     return db.query(models.User).filter(models.User.username == username).first()
@@ -73,15 +75,31 @@ def get_activity_by_id(db: Session, activity_id: int):
 def get_activities(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Activity).offset(skip).limit(limit).all()
 
-def search_activities(db: Session, sport: str, level: str, price: int, long: float, lat: float, radius: int):
+def km_distance(long1: float, lat1: float, long2: float, lat2: float):
+    # This is a simplified implementation of the Haversine formula
+    # which calculates the distance between two points on the Earth's surface
+    # given their longitudes and latitudes.
+    # It is not perfectly accurate, but it is good enough for this example.
+    # A real implementation would use a geospatial library or database extension.
+    p = 0.017453292519943295
+    a = 0.5 - math.cos((lat2 - lat1) * p)/2 + math.cos(lat1 * p) * math.cos(lat2 * p) * (1 - math.cos((long2 - long1) * p)) / 2
+    return 12742 * math.asin(math.sqrt(a))
+
+def search_activities(db: Session, sport: Optional[str] = None, level: Optional[str] = None, price: Optional[int] = None, long: Optional[float] = None, lat: Optional[float] = None, radius: Optional[int] = None):
     # For simplicity, this example does not implement actual geolocation-based searching.
     # A real implementation would require geospatial queries which SQLite does not support natively.
     # You might use PostGIS with PostgreSQL for a production scenario.
-    return db.query(models.Activity).filter(
-        models.Activity.sport == sport,
-        models.Activity.level == level,
-        models.Activity.price <= price
-    ).all()
+    db_activities = db.query(models.Activity)
+    if sport:
+        db_activities = db_activities.filter(models.Activity.sport == sport)
+    if level:
+        db_activities = db_activities.filter(models.Activity.level == level)
+    if price:
+        db_activities = db_activities.filter(models.Activity.price == price)
+    if long and lat and radius:
+        db_activities = db_activities.filter(km_distance(long, lat, models.Activity.long, models.Activity.lat) <= radius)
+
+
 
 def get_user_activities(db: Session, username: str):
     db_user = get_user_by_username(db, username=username)
