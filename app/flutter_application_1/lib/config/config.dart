@@ -13,6 +13,8 @@ class Config {
 
   String get host => 'http://localhost:8000';
 
+  int? notifyBefore = 10;
+
   final String? defToken = !kDebugMode
       ? null
       : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHJpbmciLCJleHAiOjE3MTkzOTc4MTF9.pCulGDc_PpfYbEmkVO_JEt-24C5P_MlgSl-iK3aDDzw";

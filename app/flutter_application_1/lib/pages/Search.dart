@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_application_1/data/activity.dart';
@@ -10,6 +8,7 @@ import 'package:flutter_application_1/pages/settings.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:math';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -49,50 +48,56 @@ class _SearchPageState extends State<SearchPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Search'),
-      ),
-      body: Column(
-        children: [
-          Container(
-            child: Filters(),
-          ),
-          _loading
-              ? Center(child: CircularProgressIndicator())
-              : activities.length > 0
-                  ? Expanded(
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: activities.length,
-                        itemBuilder: (context, index) {
-                          return ActivityCardWidget(
-                              activityData: activities[index]);
-                        },
-                      ),
-                    )
-                  : Center(child: Text('No activities found')),
-        ],
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            Container(
+              child: Filters(),
+            ),
+            _loading
+                ? Center(child: CircularProgressIndicator())
+                : activities.length > 0
+                    ? Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: activities.length,
+                          itemBuilder: (context, index) {
+                            return ActivityCardWidget(
+                                activityData: activities[index]);
+                          },
+                        ),
+                      )
+                    : Center(child: Text('No activities found')),
+          ],
+        ),
       ),
       drawerEnableOpenDragGesture: true,
       bottomNavigationBar: BottomAppBar(
         child: BottomAppBar(
           child: Row(
             children: <Widget>[
-              InkWell(
-                child: Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Icon(Icons.settings),
-                    ),
-                    Text('Settings'),
-                  ],
-                ),
-                onTap: () {
+              IconButton(
+                icon: Icon(Icons.settings),
+                onPressed: () {
                   Navigator.of(context).push(
                       MaterialPageRoute(builder: (builder) => SettingsPage()));
                 },
               ),
+              IconButton(
+                icon: Icon(Icons.upcoming),
+                onPressed: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (builder) => SettingsPage()));
+                },
+              ),
+              IconButton(
+                icon: Icon(Icons.history),
+                onPressed: () {
+                  Navigator.of(context).push(
+                      MaterialPageRoute(builder: (builder) => SettingsPage()));
+                },
+              )
             ],
           ),
         ),
@@ -158,6 +163,7 @@ class _FiltersState extends State<Filters> {
     }
     return Container(
       height: 50,
+      width: double.infinity,
       child: Scrollbar(
         thumbVisibility: true,
         controller: _scrollController,

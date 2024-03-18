@@ -41,6 +41,8 @@ dependencies:
   provider: ^6.1.2
   open_street_map_search_and_pick: ^0.1.1
   flutter_svg: ^2.0.10+1
+  flutter_map: ^6.1.0
+  flutter_local_notifications: ^17.0.0
 
 dev_dependencies:
   flutter_test:

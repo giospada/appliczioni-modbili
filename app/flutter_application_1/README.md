@@ -1,10 +1,11 @@
 
 # Todo
 
-- [ ] aggiungere mappe https://pub.dev/packages/google_maps_flutter
-- [ ] far vedere le attività
-- [ ] logout e basic settings come favorite sport
-- [ ] guardare un attività specifica
+- [X] far vedere le attività
+- [X] logout e basic settings come favorite sport
+- [X] create an activity
+- [X] partecipare ad una attività
+- [ ] rifare la view del attività 
+- [ ] rifare la view del search
+- [ ] notifiche push
 - [ ] feedback attività
-- [ ] create an activity
-- [ ] add images from https://undraw.co/search
