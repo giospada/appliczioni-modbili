@@ -37,7 +37,7 @@ class ActivityCreate(ActivityBase):
 
 class Activity(ActivityBase):
     id: int
-    participants: List[UserInDB] = []
+    participants: List[str] = []
     creator: str
 
     class Config:

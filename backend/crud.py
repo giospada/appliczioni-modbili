@@ -70,7 +70,9 @@ def post_feedback(db: Session, feedback: schemas.FeedbackBase):
 
 
 def get_activity_by_id(db: Session, activity_id: int):
+    # get also partecipants
     return db.query(models.Activity).filter(models.Activity.id == activity_id).first()
+
 
 def get_activities(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Activity).offset(skip).limit(limit).all()

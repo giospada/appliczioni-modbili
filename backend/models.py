@@ -43,7 +43,8 @@ class Activity(Base):
             creator=self.creator,
             position=schemas.Position(lat=self.lat, long=self.long),
             attributes=schemas.Attributes(level=self.level, price=self.price, sport=self.sport),
-            numberOfPeople=self.number_of_people
+            numberOfPeople=self.number_of_people,
+            participants=[user.username for user in self.participants]
         )
 
 User.activities = relationship(
