@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application_1/auth_provider.dart';
-import 'package:flutter_application_1/config.dart';
-import 'package:flutter_application_1/loader.dart';
-import 'package:flutter_application_1/place_picker.dart';
+import 'package:flutter_application_1/config/auth_provider.dart';
+import 'package:flutter_application_1/config/config.dart';
+import 'package:flutter_application_1/pages/loader.dart';
+import 'package:flutter_application_1/pages/place_picker.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 import 'dart:convert';
 
 import 'package:open_street_map_search_and_pick/open_street_map_search_and_pick.dart';
@@ -19,8 +18,8 @@ class CreateActivityWidget extends StatefulWidget {
 
 class _CreateActivityWidgetState extends State<CreateActivityWidget> {
   final PageController _pageController = PageController();
-  bool _isSwipeEnabled =
-      true; // Change this to false if you want to initially disable swiping
+  // Change this to false if you want to initially disable swiping
+  final bool _isSwipeEnabled = true;
 
   // Dummy function to illustrate enabling navigation to next page
   final int _pageNumber = 2;
@@ -28,14 +27,14 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
 
   TextEditingController descriptionController = TextEditingController();
   int numberOfPeople = 0;
-  String _selectedSport = 'running';
-  List<String> _allSports = ['running', 'basketball', 'football'];
+  String _selectedSport = Config().sports[0];
+  final List<String> _allSports = Config().sports;
 
   bool _isFree = true;
   double _price = 0;
-  DateTime? selectedDate = null;
+  DateTime? selectedDate;
   double long = 0, lati = 0;
-  String? address = null;
+  String? address;
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -80,7 +79,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
           builder: (context) => AsyncLoaderPage(
               asyncOperation: () async => await _request(context))));
 
-      if (data is Response) {
+      if (data is http.Response) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Activity created')));
         Navigator.pop(context);

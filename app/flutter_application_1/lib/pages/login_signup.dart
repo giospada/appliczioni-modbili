@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_application_1/auth_provider.dart';
-import 'package:flutter_application_1/config.dart';
+import 'package:flutter_application_1/config/auth_provider.dart';
+import 'package:flutter_application_1/config/config.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_svg/flutter_svg.dart';

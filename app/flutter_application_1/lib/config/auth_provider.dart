@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/config/config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
 
@@ -26,6 +27,7 @@ class AuthProvider with ChangeNotifier {
     final accessToken = await storage.read(key: 'accessToken');
     loading = false;
     if (accessToken == null) {
+      _token = Config().defToken;
       notifyListeners();
       return;
     }

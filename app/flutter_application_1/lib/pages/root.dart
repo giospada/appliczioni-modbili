@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/home.dart';
-import 'package:flutter_application_1/login_signup.dart';
-import 'package:flutter_application_1/new_activity.dart';
-import 'package:flutter_application_1/settings.dart';
-import 'package:flutter_application_1/splash_screen.dart';
-import 'package:flutter_application_1/theme.dart';
+import 'package:flutter_application_1/pages/home.dart';
+import 'package:flutter_application_1/pages/login_signup.dart';
+import 'package:flutter_application_1/pages/new_activity.dart';
+import 'package:flutter_application_1/pages/settings.dart';
+import 'package:flutter_application_1/pages/splash_screen.dart';
+import 'package:flutter_application_1/config/theme.dart';
 
 class Root extends StatelessWidget {
   const Root({super.key});
