@@ -66,7 +66,7 @@ def create_activity(activity: schemas.ActivityCreate, db: Session = Depends(get_
     token_data = auth.verify_token(token, credentials_exception)
     return crud.create_activity(db=db, activity=activity, username=token_data.username).toActivityBase()
 
-@app.get("/activities/search", response_model=List[str])
+@app.get("/activities/search", response_model=List[int])
 def search_for_activities(
         sport: Optional[str] = None, level: Optional[str] = None,
         price: Optional[int] = None, long: Optional[float] = None,

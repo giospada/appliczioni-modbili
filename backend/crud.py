@@ -98,6 +98,8 @@ def search_activities(db: Session, sport: Optional[str] = None, level: Optional[
         db_activities = db_activities.filter(models.Activity.price == price)
     if long and lat and radius:
         db_activities = db_activities.filter(km_distance(long, lat, models.Activity.long, models.Activity.lat) <= radius)
+    
+    return db_activities.all()
 
 
 
