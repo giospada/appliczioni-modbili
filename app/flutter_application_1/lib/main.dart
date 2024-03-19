@@ -1,6 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/root.dart';
+import 'package:SportMates/pages/root.dart';
 
-void main() {
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  var initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
+  var initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
   runApp(const Root());
 }

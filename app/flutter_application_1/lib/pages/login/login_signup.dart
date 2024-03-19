@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_application_1/config/auth_provider.dart';
-import 'package:flutter_application_1/config/config.dart';
+import 'package:SportMates/config/auth_provider.dart';
+import 'package:SportMates/config/config.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -30,8 +30,8 @@ class _LoginSignupScreenState extends State<LoginSignupScreen> {
 
     _formKey.currentState?.save();
     final response = await http.post(
-      Uri.parse(
-          '${config.host}/${ActionState.login == current_action ? 'login' : 'sign up'}'),
+      Uri.http(config.host,
+          '/${ActionState.login == current_action ? 'login' : 'sign up'}'),
       body: json.encode({'username': _email, 'password': _password}),
       headers: {
         'Content-Type': 'application/json',

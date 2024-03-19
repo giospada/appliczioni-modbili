@@ -1,12 +1,15 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/config/auth_provider.dart';
-import 'package:flutter_application_1/data/activity.dart';
-import 'package:flutter_application_1/config/config.dart';
+import 'package:SportMates/config/auth_provider.dart';
+import 'package:SportMates/data/activity.dart';
+import 'package:SportMates/config/config.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:flutter_application_1/pages/loader.dart';
+import 'package:SportMates/pages/general_purpuse/loader.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:provider/provider.dart';
 
 class ActivityDetailsWidget extends StatelessWidget {
@@ -18,7 +21,7 @@ class ActivityDetailsWidget extends StatelessWidget {
 
   Future<http.Response> _tryJoin(int id) async {
     final response = await http.post(
-      Uri.parse('${Config().host}/activities/register'),
+      Uri.http(Config().host, '/activities/register'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -42,6 +45,42 @@ class ActivityDetailsWidget extends StatelessWidget {
       ),
       body: Column(
         children: <Widget>[
+          Container(
+            height: 300,
+            child: FlutterMap(
+                options: MapOptions(
+                  initialCenter: LatLng(
+                      activityData.position.lat, activityData.position.long),
+                  initialZoom: 13.0,
+                ),
+                children: [
+                  TileLayer(
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.example.app',
+                  ),
+                  MarkerLayer(markers: [
+                    Marker(
+                      width: 80.0,
+                      height: 80.0,
+                      point: LatLng(activityData.position.lat,
+                          activityData.position.long),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.location_on,
+                          color: Colors.red,
+                          size: 40,
+                        ),
+                        onPressed: () {
+                          MapsLauncher.launchCoordinates(
+                              activityData.position.lat,
+                              activityData.position.long);
+                        },
+                      ),
+                    ),
+                  ])
+                ]),
+          ),
           Padding(
             padding: EdgeInsets.all(10),
             child: Text(activityData.description),
@@ -67,7 +106,7 @@ class ActivityDetailsWidget extends StatelessWidget {
               children: activityData.participants
                   .map((e) => ListTile(
                         leading: FadeInImage.assetNetwork(
-                            placeholder: 'assets/images/logo.png',
+                            placeholder: 'assets/images/avatar.png',
                             image:
                                 'https://api.dicebear.com/7.x/lorelei/png?seed=${e}'),
                         title: Text(e),

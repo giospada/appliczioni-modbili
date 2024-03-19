@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/home.dart';
-import 'package:flutter_application_1/pages/login_signup.dart';
-import 'package:flutter_application_1/pages/new_activity.dart';
-import 'package:flutter_application_1/pages/settings.dart';
-import 'package:flutter_application_1/pages/splash_screen.dart';
-import 'package:flutter_application_1/config/theme.dart';
+import 'package:SportMates/pages/home.dart';
+import 'package:SportMates/pages/login/login_signup.dart';
+import 'package:SportMates/pages/new_activity/new_activity.dart';
+import 'package:SportMates/pages/settings/settings.dart';
+import 'package:SportMates/pages/general_purpuse/splash_screen.dart';
+import 'package:SportMates/config/theme.dart';
 
 class Root extends StatelessWidget {
   const Root({super.key});

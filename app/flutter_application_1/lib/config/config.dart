@@ -11,7 +11,7 @@ class Config {
 
   Config._internal();
 
-  String get host => 'http://localhost:8000';
+  String get host => 'localhost:8000';
 
   int? notifyBefore = 10;
 

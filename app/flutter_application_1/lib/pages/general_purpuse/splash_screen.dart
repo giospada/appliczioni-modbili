@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/home.dart';
-import 'package:flutter_application_1/pages/home.dart';
+import 'package:SportMates/pages/home.dart';
+import 'package:SportMates/pages/home.dart';
 import 'dart:math';
 
 class SplashScreen extends StatefulWidget {
@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: kDebugMode ? 0 : 4),
+      duration: const Duration(seconds: 4),
       vsync: this,
     )..forward();
     _animation = CurvedAnimation(parent: _controller!, curve: SpringCurve());

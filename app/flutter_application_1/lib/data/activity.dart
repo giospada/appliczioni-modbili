@@ -1,7 +1,7 @@
 class Activity {
   final String description;
   final DateTime time;
-  final Position position;
+  final PositionActivity position;
   final Attributes attributes;
   final int numberOfPeople;
   final int id;
@@ -23,7 +23,7 @@ class Activity {
     return Activity(
       description: json['description'],
       time: DateTime.parse(json['time']),
-      position: Position(
+      position: PositionActivity(
         long: json['position']['long'],
         lat: json['position']['lat'],
       ),
@@ -40,11 +40,11 @@ class Activity {
   }
 }
 
-class Position {
+class PositionActivity {
   final double long;
   final double lat;
 
-  Position({
+  PositionActivity({
     required this.long,
     required this.lat,
   });

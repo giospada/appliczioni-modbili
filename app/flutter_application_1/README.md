@@ -10,3 +10,4 @@
 - [ ] notifiche push https://pub.dev/packages/flutter_local_notifications segui i step di installazione
 - [ ] implementare i filtri
 - [ ] feedback attività
+- [ ] crea la visualizzazione da mappa https://docs.fleaflet.dev/usage/basics

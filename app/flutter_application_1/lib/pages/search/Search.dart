@@ -1,10 +1,13 @@
+import 'package:SportMates/pages/search/Filters.dart';
+import 'package:SportMates/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_application_1/data/activity.dart';
-import 'package:flutter_application_1/pages/activity_card.dart';
-import 'package:flutter_application_1/config/config.dart';
-import 'package:flutter_application_1/pages/new_activity.dart';
-import 'package:flutter_application_1/pages/settings.dart';
+import 'package:SportMates/data/activity.dart';
+import 'package:SportMates/pages/general_purpuse/activity_card.dart';
+import 'package:SportMates/config/config.dart';
+import 'package:SportMates/pages/new_activity/new_activity.dart';
+import 'package:SportMates/pages/settings/settings.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -18,17 +21,29 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   bool _loading = true;
   List<Activity> activities = [];
+  Position? pos;
+  Filters filters = Filters();
 
   void loadIds() async {
-    final req = await http.get(Uri.parse('${Config().host}/activities/search'));
+    Map<String, dynamic> params = {};
+
+    if (pos != null) {
+      params['lat'] = pos!.latitude.toString();
+      params['lon'] = pos!.longitude.toString();
+    }
+
+    final req =
+        await http.get(Uri.http(Config().host, '/activities/search', params));
     if (req.statusCode != 200) {
       throw Exception('Failed to load ids');
     }
     final ids = json.decode(req.body);
     _loading = false;
     ids.forEach((id) async {
-      final activityReq =
-          await http.get(Uri.parse('${Config().host}/activities/$id'));
+      final activityReq = await http.get(Uri.http(
+        Config().host,
+        '/activities/$id',
+      ));
       if (activityReq.statusCode != 200) {
         throw Exception('Failed to load activity');
       }
@@ -39,10 +54,15 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
+  Future<void> start() async {
+    pos = await determinePosition();
+    loadIds();
+  }
+
   @override
   void initState() {
     super.initState();
-    loadIds();
+    start();
   }
 
   @override
@@ -53,7 +73,7 @@ class _SearchPageState extends State<SearchPage> {
         child: Column(
           children: [
             Container(
-              child: Filters(),
+              child: filters,
             ),
             _loading
                 ? Center(child: CircularProgressIndicator())
@@ -110,70 +130,6 @@ class _SearchPageState extends State<SearchPage> {
         child: Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
-    );
-  }
-}
-
-class ActivityCard {}
-
-class Filters extends StatefulWidget {
-  const Filters({super.key});
-
-  @override
-  State<Filters> createState() => _FiltersState();
-}
-
-class _FiltersState extends State<Filters> {
-  Map<String, String> filters = {};
-  final ScrollController _scrollController = ScrollController();
-  @override
-  void dispose() {
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  Widget filterToChip(String filterName, String filterValue) {
-    return Chip(
-      label: Text(filterValue),
-      onDeleted: () {
-        setState(() {
-          filters.remove(filterName);
-        });
-      },
-    );
-  }
-
-  void filterDialog() {}
-
-  @override
-  Widget build(BuildContext context) {
-    List<Widget> filterChips = [];
-    filterChips.add(ActionChip(
-      label: Text('Filter'),
-      avatar: Icon(Icons.filter),
-      onPressed: () {
-        setState(() {
-          int i = Random().nextInt(100);
-          filters['filter ${i}'] = 'filter ${i}';
-        });
-      },
-    ));
-    for (var filter in filters.entries) {
-      filterChips.add(filterToChip(filter.key, filter.value));
-    }
-    return Container(
-      height: 50,
-      width: double.infinity,
-      child: Scrollbar(
-        thumbVisibility: true,
-        controller: _scrollController,
-        child: ListView(
-          controller: _scrollController,
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          children: filterChips,
-        ),
-      ),
     );
   }
 }

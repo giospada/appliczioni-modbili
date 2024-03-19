@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/Search.dart';
+import 'package:SportMates/pages/search/Search.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_application_1/config/auth_provider.dart';
-import 'package:flutter_application_1/pages/login_signup.dart';
+import 'package:SportMates/config/auth_provider.dart';
+import 'package:SportMates/pages/login/login_signup.dart';
 
 class Home extends StatelessWidget {
   @override

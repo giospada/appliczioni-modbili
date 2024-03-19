@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/config/config.dart';
-import 'package:flutter_application_1/data/activity.dart';
-import 'package:flutter_application_1/pages/activity_details.dart';
-import 'package:flutter_application_1/pages/utils.dart';
+import 'package:SportMates/config/config.dart';
+import 'package:SportMates/data/activity.dart';
+import 'package:SportMates/pages/general_purpuse/activity_details.dart';
+import 'package:SportMates/utils.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -43,16 +43,22 @@ class ActivityCardWidget extends StatelessWidget {
                     children: <Widget>[
                       Column(
                         children: [
-                          Text(
-                            'restanti ' + restanti.toString(),
-                            style: TextStyle(
-                                color: restanti > 5
-                                    ? Colors.green
-                                    : (restanti > 2
-                                        ? Colors.orange
-                                        : Colors.red)),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text('restanti '),
+                              Text(
+                                restanti.toString(),
+                                style: TextStyle(
+                                    color: restanti > 5
+                                        ? Colors.green
+                                        : (restanti > 2
+                                            ? Colors.orange
+                                            : Colors.red)),
+                              ),
+                            ],
                           ),
-                          Text(activityData.time.toString())
+                          Text(displayFormattedDate(activityData.time))
                         ],
                       ),
                       Column(

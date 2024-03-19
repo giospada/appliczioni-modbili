@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_application_1/config/auth_provider.dart';
-import 'package:flutter_application_1/config/config.dart';
-import 'package:flutter_application_1/pages/loader.dart';
-import 'package:flutter_application_1/pages/place_picker.dart';
+import 'package:SportMates/config/auth_provider.dart';
+import 'package:SportMates/config/config.dart';
+import 'package:SportMates/pages/general_purpuse/loader.dart';
+import 'package:SportMates/pages/general_purpuse/place_picker.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -127,7 +127,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
     Config config = Config();
     final token = Provider.of<AuthProvider>(context).token;
     final response = await http.post(
-      Uri.parse('${config.host}/activities'),
+      Uri.http(config.host, '/activities'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token'

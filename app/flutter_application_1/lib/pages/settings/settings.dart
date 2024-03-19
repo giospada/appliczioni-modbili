@@ -1,8 +1,8 @@
 import 'dart:js_util';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/config/auth_provider.dart';
-import 'package:flutter_application_1/config/config.dart';
+import 'package:SportMates/config/auth_provider.dart';
+import 'package:SportMates/config/config.dart';
 import 'package:provider/provider.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -28,7 +28,7 @@ class SettingsPage extends StatelessWidget {
                     clipBehavior: Clip.antiAlias,
                     decoration: BoxDecoration(shape: BoxShape.circle),
                     child: FadeInImage.assetNetwork(
-                        placeholder: 'assets/images/logo.png',
+                        placeholder: 'assets/images/avatar.png',
                         image:
                             'https://api.dicebear.com/7.x/lorelei/png?seed=${username}')),
               ],

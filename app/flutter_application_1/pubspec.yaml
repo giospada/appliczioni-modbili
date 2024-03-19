@@ -1,6 +1,7 @@
-name: flutter_application_1
-description: "A new Flutter project."
-# The following line prevents the package from being accidentally published to
+name: SportMates
+description: "Are you looking for a tennis partner to hit the courts with on weekends? Or maybe a running buddy who shares your early morning enthusiasm? Whatever your sport, whatever your level, SportMates is here to connect you with the perfect match!"
+
+ # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -43,6 +44,10 @@ dependencies:
   flutter_svg: ^2.0.10+1
   flutter_map: ^6.1.0
   flutter_local_notifications: ^17.0.0
+  geolocator: ^10.1.1
+  latlong2: ^0.9.0
+  flutter_map_cancellable_tile_provider: ^2.0.0
+  maps_launcher: ^2.2.1
 
 dev_dependencies:
   flutter_test:
@@ -69,6 +74,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/images/logo.png
+    - assets/images/avatar.png
     - assets/svg/basketball.svg
     - assets/svg/football.svg
     - assets/svg/online_calendar.svg  
