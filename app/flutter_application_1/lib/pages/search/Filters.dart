@@ -6,8 +6,6 @@ class Filters extends StatefulWidget {
 
   @override
   State<Filters> createState() => _FiltersState();
-
-  get filters => _FiltersState().filters;
 }
 
 final String _nullSport = 'Nessuno';

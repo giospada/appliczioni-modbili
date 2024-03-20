@@ -1,7 +1,8 @@
+import 'package:SportMates/data/activity.dart';
 import 'package:flutter/material.dart';
 import 'package:SportMates/config/config.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 
 Map<String, IconData> sportToIcon = {
   "running": Icons.directions_run,
@@ -86,12 +87,34 @@ Future<void> scheduleNotification(DateTime scheduledDate) async {
   //        UILocalNotificationDateInterpretation.absoluteTime);
 }
 
-String getMeterOrKmDistance(Position p1, Position p2) {
-  double distance = Geolocator.distanceBetween(
-      p1.latitude, p1.longitude, p2.latitude, p2.longitude);
+bool isInRatio(PositionActivity p1, PositionActivity p2, double radio) {
+  double distance =
+      Geolocator.distanceBetween(p1.lat, p1.long, p2.lat, p2.long);
+  return radio < distance;
+}
+
+String getMeterOrKmDistance(PositionActivity p1, PositionActivity p2) {
+  double distance =
+      Geolocator.distanceBetween(p1.lat, p1.long, p2.lat, p2.long);
   if (distance < 1000) {
     return "${distance.toStringAsFixed(0)} m";
   } else {
     return "${(distance / 1000).toStringAsFixed(2)} km";
   }
+}
+
+Position createSimplePosition(LatLng latLong) {
+  return Position(
+    latitude: latLong.latitude,
+    longitude: latLong.longitude,
+    timestamp: DateTime.now(), // Not available
+    accuracy: 0.0, // Default to 0 for simplicity
+    altitude: 0.0, // Default to 0
+    heading: 0.0,
+    speed: 0.0,
+    speedAccuracy: 0.0, // Not available
+    floor: null, // Not available
+    isMocked: false, altitudeAccuracy: 0.0,
+    headingAccuracy: 0.0, // Default to false
+  );
 }

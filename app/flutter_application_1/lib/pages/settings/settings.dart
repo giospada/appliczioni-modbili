@@ -49,8 +49,8 @@ class SettingsPage extends StatelessWidget {
                 value: Config().notifyBefore,
                 items: [5, 10, 15, 20, 30, 60, null]
                     .map<DropdownMenuItem<int>>((e) => DropdownMenuItem<int>(
-                          child: Text(e != null ? '$e minutes' : 'Never'),
                           value: e,
+                          child: Text(e != null ? '$e minutes' : 'Never'),
                         ))
                     .toList(),
                 onChanged: (value) {
@@ -59,8 +59,8 @@ class SettingsPage extends StatelessWidget {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
+              leading: const Icon(Icons.logout),
+              title: const Text('Logout'),
               onTap: () {
                 Provider.of<AuthProvider>(context, listen: false).logout();
                 Navigator.pop(context);

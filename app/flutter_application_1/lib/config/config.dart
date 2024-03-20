@@ -1,6 +1,5 @@
 // singleton with configuration
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 
 class Config {
   static final Config _config = Config._internal();
@@ -14,6 +13,8 @@ class Config {
   String get host => 'localhost:8000';
 
   int? notifyBefore = 10;
+
+  String nullSport = 'Nessuno';
 
   final String? defToken = !kDebugMode
       ? null

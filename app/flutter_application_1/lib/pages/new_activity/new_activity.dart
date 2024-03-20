@@ -1,3 +1,4 @@
+import 'package:SportMates/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:SportMates/config/auth_provider.dart';
@@ -181,9 +182,12 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                     if (result != null) {
                       long = result['long'];
                       lati = result['lat'];
+                      address = result['address'];
                     }
                   },
-                  child: Text('Pick Location'),
+                  child: Column(
+                    children: [Text('Pick Location'), Text(address ?? ' ')],
+                  ),
                 )),
             LayoutWidget(
                 svgPath: 'assets/svg/online_calendar.svg',
@@ -199,7 +203,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                         padding: const EdgeInsets.all(8.0),
                         child: Text(selectedDate == null
                             ? 'No date selected'
-                            : 'Selected date: ${selectedDate!.toLocal()}'))
+                            : 'Selected date: ${displayFormattedDate(selectedDate!)}'))
                   ],
                 )),
             LayoutWidget(
@@ -254,17 +258,21 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                         ? TextFormField(
                             decoration: InputDecoration(labelText: 'Price'),
                             keyboardType: TextInputType.number,
-                            onSaved: (value) =>
-                                _price = double.parse(value ?? '0'),
+                            onChanged: (value) {
+                              value = value == '' ? '0' : value;
+                              _price = double.parse(value ?? '0');
+                            },
                           )
                         : null,
                   ),
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Number of People'),
-                    keyboardType: TextInputType.number,
-                    onSaved: (value) =>
-                        numberOfPeople = int.parse(value ?? '0'),
-                  )
+                      decoration:
+                          InputDecoration(labelText: 'Number of People'),
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) {
+                        value = value == '' ? '0' : value;
+                        numberOfPeople = int.parse(value ?? '0');
+                      })
                 ],
               ),
             ),

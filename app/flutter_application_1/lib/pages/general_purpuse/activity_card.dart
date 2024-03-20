@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:SportMates/config/config.dart';
 import 'package:SportMates/data/activity.dart';
 import 'package:SportMates/pages/general_purpuse/activity_details.dart';
 import 'package:SportMates/utils.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:geolocator/geolocator.dart';
 
 class ActivityCardWidget extends StatelessWidget {
   final Activity activityData;
+  final Position? pos;
 
-  ActivityCardWidget({Key? key, required this.activityData}) : super(key: key);
+  const ActivityCardWidget(
+      {Key? key, required this.activityData, required this.pos})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     int restanti =
-        (activityData.participants.length - activityData.numberOfPeople);
-
+        (activityData.numberOfPeople - activityData.participants.length);
+    PositionActivity positionActivity =
+        PositionActivity(long: pos!.longitude, lat: pos!.latitude);
     return InkWell(
       onTap: () {
         // Material
@@ -27,7 +29,7 @@ class ActivityCardWidget extends StatelessWidget {
       },
       child: Card(
         child: Padding(
-          padding: EdgeInsets.fromLTRB(8, 10, 8, 8),
+          padding: EdgeInsets.fromLTRB(8, 12, 8, 8),
           child: Column(
             children: <Widget>[
               Row(
@@ -38,41 +40,55 @@ class ActivityCardWidget extends StatelessWidget {
                         size: 40),
                   ),
                   Expanded(
-                      child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Text('restanti '),
-                              Text(
-                                restanti.toString(),
-                                style: TextStyle(
-                                    color: restanti > 5
-                                        ? Colors.green
-                                        : (restanti > 2
-                                            ? Colors.orange
-                                            : Colors.red)),
-                              ),
-                            ],
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          displayFormattedDate(activityData.time),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
                           ),
-                          Text(displayFormattedDate(activityData.time))
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text("30 km"),
-                          Text(activityData.attributes.price.toString() + "€")
-                        ],
-                      ),
-                    ],
-                  ))
+                        ),
+                        Text(activityData.description),
+                      ],
+                    ),
+                  )
                 ],
               ),
               Divider(),
-              Text(activityData.description)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Row(
+                    children: [
+                      Text(
+                          "${getMeterOrKmDistance(activityData.position, positionActivity)} distanza"),
+                      SizedBox(width: 10),
+                      (activityData.attributes.price == 0)
+                          ? Text(
+                              "Gratis",
+                              style: TextStyle(color: Colors.green),
+                            )
+                          : Text(
+                              activityData.attributes.price.toString() + "€",
+                            ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Text('restanti '),
+                      Text(
+                        restanti.toString(),
+                        style: TextStyle(
+                            color: restanti > 5
+                                ? Colors.green
+                                : (restanti > 2 ? Colors.orange : Colors.red)),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ],
           ),
         ),

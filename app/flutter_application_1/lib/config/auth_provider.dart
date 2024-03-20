@@ -6,7 +6,7 @@ import 'dart:convert';
 class AuthProvider with ChangeNotifier {
   String? _token;
   bool loading = true;
-  final storage = FlutterSecureStorage();
+  final storage = const FlutterSecureStorage();
 
   String? get token => _token;
   // decode jwt token to get the paylod
