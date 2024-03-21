@@ -27,6 +27,27 @@ def authenticate_user(db: Session, username: str, password: str):
         return False
     return user
 
+def delete_activity(db: Session, activity_id: int,username:str):
+    activity = db.query(models.Activity).filter(models.Activity.id == activity_id).first()
+    if activity is None:
+        raise Exception("Activity not found")
+    if activity.creator != username:
+        raise Exception("User not authorized to delete activity")
+    db.delete(activity)
+    db.commit()
+
+def leave_activity(db: Session, activity_id: int, username: str):
+    activity = db.query(models.Activity).filter(models.Activity.id == activity_id).first()
+    if activity is None:
+        raise Exception("Activity not found")
+    user = db.query(models.User).filter(models.User.username == username).first()
+    if user is None:
+        raise Exception("User not found")
+    if user not in activity.participants:
+        raise Exception("User not in activity")
+    activity.participants.remove(user)
+    db.commit()
+
 def create_activity(db: Session, activity: schemas.ActivityCreate, username: str):
     db_user = get_user_by_username(db, username=username)
     if not db_user:

@@ -4,6 +4,24 @@ import 'package:SportMates/config/config.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
+List<Activity> historyActivity(
+    String user, List<Activity> activities, Position? pos) {
+  return activities
+      .where((element) =>
+          element.time.isBefore(DateTime.now()) &&
+          element.participants.contains(user))
+      .toList();
+}
+
+List<Activity> upcomingFilter(
+    String user, List<Activity> activities, Position? pos) {
+  return activities
+      .where((element) =>
+          element.time.isAfter(DateTime.now()) &&
+          element.participants.contains(user))
+      .toList();
+}
+
 Map<String, IconData> sportToIcon = {
   "running": Icons.directions_run,
   "cycling": Icons.directions_bike,

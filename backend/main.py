@@ -112,6 +112,26 @@ def submit_feedback(feedback: schemas.FeedbackBase, db: Session = Depends(get_db
         print(e)
         raise HTTPException(status_code=404, detail="Activity not found")
 
+@app.delete("/activity/{activity_id}")
+async def delete_activity(activity_id: int, db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    token_data = auth.verify_token(token, credentials_exception)
+    return crud.delete_activity(db, activity_id,token_data.username)
+
+@app.post("/activity/{activity_id}/leave")
+async def leave_activity(activity_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    token_data = auth.verify_token(token, credentials_exception)
+    return crud.leave_activity(db,activity_id, token_data.username)
+
 
 if __name__ == "__main__":
     import uvicorn

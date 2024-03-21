@@ -1,7 +1,9 @@
+import 'package:SportMates/config/auth_provider.dart';
 import 'package:SportMates/pages/search/Filters.dart';
 import 'package:SportMates/pages/search/choose_radius.dart';
 import 'package:SportMates/pages/search/filter_dialog.dart';
 import 'package:SportMates/pages/search/map_search.dart';
+import 'package:SportMates/pages/upcoming_activity/upcoming_activity.dart';
 import 'package:SportMates/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -26,15 +28,16 @@ enum ViewState { map, list }
 
 class _SearchPageState extends State<SearchPage> {
   bool _loading = true;
+
+  Position? pos;
   List<Activity> activities = [];
   List<Activity> display_activities = [];
-  Position? pos;
-  double radius = 5000;
-  Map<String, dynamic> filters = {};
 
+  double radius = 5000;
   double maxPrice = 0;
   bool price = false;
   String selectedSport = Config().nullSport;
+  DateTime? startDate = null, endDate = null;
 
   ViewState viewState = ViewState.list;
 
@@ -45,50 +48,56 @@ class _SearchPageState extends State<SearchPage> {
         return DialogFilter();
       },
     );
-    price = data.elementAt(0);
-    selectedSport = data.elementAt(1);
-    maxPrice = data.elementAt(2);
+    price = data[0];
+    selectedSport = data[1];
+    maxPrice = data[2];
+    startDate = data[3];
+    endDate = data[4];
     filter();
   }
 
   void loadIds() async {
+    setState(() {
+      _loading = true;
+    });
     final req = await http.get(Uri.http(Config().host, '/activities/search'));
     if (req.statusCode != 200) {
       throw Exception('Failed to load ids');
     }
     final ids = json.decode(req.body);
 
-    ids.forEach((id) async {
-      final activityReq = await http.get(Uri.http(
-        Config().host,
-        '/activities/$id',
-      ));
-      if (activityReq.statusCode != 200) {
-        throw Exception('Failed to load activity');
+    loadAllActivitys(ids.cast<int>());
+  }
+
+  void loadAllActivitys(List<int> ids) async {
+    var futures = ids.map((e) async {
+      var value = await http.get(Uri.http(Config().host, '/activities/$e'));
+      if (value.statusCode == 200) {
+        return (Activity.fromJson(json.decode(value.body)));
       }
-      final activity = json.decode(activityReq.body);
-      setState(() {
-        _loading = false;
-        activities.add(Activity.fromJson(activity));
-      });
-      filter();
-    });
+    }).toList();
+    var result = await Future.wait(futures);
+    activities = result.cast<Activity>();
+    filter();
   }
 
   void filter() {
     setState(() {
       display_activities = activities.where((element) {
+        if (element.numberOfPeople - element.participants.length <= 0) {
+          return false;
+        }
         if (price) {
           if (element.attributes.price > maxPrice) {
             return false;
           }
         }
-        // if (isInRatio(
-        //     element.position,
-        //     PositionActivity(long: pos!.longitude, lat: pos!.latitude),
-        //     radius)) {
-        //   return false;
-        // }
+        if (isInRatio(
+            element.position,
+            PositionActivity(long: pos!.longitude, lat: pos!.latitude),
+            radius)) {
+          return false;
+        }
         if (selectedSport != Config().nullSport) {
           if (element.attributes.sport != selectedSport) {
             return false;
@@ -97,8 +106,15 @@ class _SearchPageState extends State<SearchPage> {
         if (DateTime.now().isAfter(element.time)) {
           return false;
         }
+        if (startDate != null && startDate!.isAfter(element.time)) {
+          return false;
+        }
+        if (endDate != null && endDate!.isBefore(element.time)) {
+          return false;
+        }
         return true;
       }).toList();
+      _loading = false;
     });
   }
 
@@ -113,19 +129,16 @@ class _SearchPageState extends State<SearchPage> {
     start();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  List<Widget> createFilterChips() {
     List<Widget> filterChips = [];
-
     if (price) {
       filterChips.add(Chip(
         label: Text('Prezzo Massimo $maxPrice €'),
         avatar: Icon(Icons.filter),
         onDeleted: () {
-          setState(() {
-            price = false;
-            maxPrice = 0;
-          });
+          price = false;
+          maxPrice = 0;
+          filter();
         },
       ));
     }
@@ -134,16 +147,43 @@ class _SearchPageState extends State<SearchPage> {
         label: Text('Sport: $selectedSport'),
         avatar: Icon(Icons.filter),
         onDeleted: () {
-          setState(() {
-            selectedSport = Config().nullSport;
-          });
+          selectedSport = Config().nullSport;
+          filter();
         },
       ));
     }
+    if (startDate != null) {
+      filterChips.add(Chip(
+        label: Text(
+            'Data minima: ${startDate!.day}/${startDate!.month}/${startDate!.year}'),
+        avatar: Icon(Icons.filter),
+        onDeleted: () {
+          startDate = null;
+          filter();
+        },
+      ));
+    }
+    if (endDate != null) {
+      filterChips.add(Chip(
+        label: Text(
+            'Data massima: ${endDate!.day}/${endDate!.month}/${endDate!.year}'),
+        avatar: Icon(Icons.filter),
+        onDeleted: () {
+          endDate = null;
+          filter();
+        },
+      ));
+    }
+    return filterChips;
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    final user = Provider.of<AuthProvider>(context).getUsername!;
+    var upcoming = upcomingFilter(user, activities, pos);
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.fromLTRB(8, 0, 8, 0),
         child: Column(
           children: [
             Row(
@@ -183,7 +223,7 @@ class _SearchPageState extends State<SearchPage> {
                   width: 10,
                 ),
                 ActionChip(
-                  label: Text('Radius'),
+                  label: Text('Radius and Position'),
                   onPressed: () async {
                     var chosenRadius = await Navigator.of(context).push(
                         MaterialPageRoute(
@@ -199,14 +239,30 @@ class _SearchPageState extends State<SearchPage> {
                   },
                   avatar: Icon(Icons.sort),
                 ),
+                SizedBox(
+                  width: 10,
+                ),
+                ActionChip(
+                  label: Text('Refresh'),
+                  onPressed: () async {
+                    setState(() {
+                      activities = [];
+                      loadIds();
+                    });
+                  },
+                  avatar: Icon(Icons.refresh),
+                ),
               ],
             ),
             SizedBox(
               height: 10,
             ),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: filterChips),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: createFilterChips()),
+            ),
             (_loading || pos == null)
                 ? Center(child: CircularProgressIndicator())
                 : (viewState == ViewState.map)
@@ -249,12 +305,16 @@ class _SearchPageState extends State<SearchPage> {
                       MaterialPageRoute(builder: (builder) => SettingsPage()));
                 },
               ),
-              IconButton(
-                icon: Icon(Icons.upcoming),
-                onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (builder) => SettingsPage()));
-                },
+              Badge(
+                isLabelVisible: upcoming.isNotEmpty,
+                child: IconButton(
+                  icon: Icon(Icons.upcoming),
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (builder) =>
+                            UpcoingActivity(activities: upcoming, pos: pos!)));
+                  },
+                ),
               ),
               IconButton(
                 icon: Icon(Icons.history),

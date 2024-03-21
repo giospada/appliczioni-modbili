@@ -24,8 +24,8 @@ class ActivityCardWidget extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    ActivityDetailsWidget(activityData: activityData)));
+                builder: (context) => ActivityDetailsWidget(
+                    activityData: activityData, position: pos!)));
       },
       child: Card(
         child: Padding(
