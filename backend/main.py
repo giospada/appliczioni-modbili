@@ -112,6 +112,16 @@ def submit_feedback(feedback: schemas.FeedbackBase, db: Session = Depends(get_db
         print(e)
         raise HTTPException(status_code=404, detail="Activity not found")
 
+@app.get("/feedback", response_model=list[schemas.FeedbackBase])
+def get_feedbacks(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    token_data = auth.verify_token(token, credentials_exception)
+    return crud.get_activity_feedback(db, token_data.username)
+
 @app.delete("/activity/{activity_id}")
 async def delete_activity(activity_id: int, db: Session = Depends(get_db),token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(

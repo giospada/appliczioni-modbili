@@ -124,6 +124,12 @@ def search_activities(db: Session, sport: Optional[str] = None, level: Optional[
     
     return db_activities.all()
 
+def get_activity_feedback(db: Session, username: str):
+    db_user = get_user_by_username(db, username=username)
+    if db_user:
+        return db.query(models.Feedback).filter(models.Feedback.username == username).all()
+    else:
+        raise HTTPException(status_code=404, detail="User not found")
 
 
 def get_user_activities(db: Session, username: str):
