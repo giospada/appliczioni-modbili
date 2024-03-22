@@ -1,4 +1,5 @@
 import 'package:SportMates/config/config.dart';
+import 'package:SportMates/utils.dart';
 import 'package:flutter/material.dart';
 
 class DialogFilter extends StatefulWidget {
@@ -95,21 +96,59 @@ class _DialogFilterState extends State<DialogFilter> {
                     )
                   : null,
             ),
-            ElevatedButton(
-              child: Text('Select start date'),
-              onPressed: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: startDate ?? DateTime.now(),
-                  firstDate: DateTime(2000),
-                  lastDate: DateTime(2100),
-                );
-                if (date != null) {
-                  setState(() {
-                    startDate = date;
-                  });
-                }
-              },
+            Row(
+              children: [
+                ElevatedButton(
+                  child: Text('Select start date'),
+                  onPressed: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: startDate ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    );
+                    if (date != null) {
+                      setState(() {
+                        startDate = date;
+                      });
+                    }
+                  },
+                ),
+                (startDate != null)
+                    ? Chip(
+                        label: Text(displayFormattedDate(startDate!)),
+                        onDeleted: () => setState(() {
+                              startDate = null;
+                            }))
+                    : Text('No date selected')
+              ],
+            ),
+            Row(
+              children: [
+                ElevatedButton(
+                  child: Text('Select end date'),
+                  onPressed: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: endDate ?? DateTime.now(),
+                      firstDate: DateTime(2000),
+                      lastDate: DateTime(2100),
+                    );
+                    if (date != null) {
+                      setState(() {
+                        startDate = date;
+                      });
+                    }
+                  },
+                ),
+                (endDate != null)
+                    ? Chip(
+                        label: Text(displayFormattedDate(endDate!)),
+                        onDeleted: () => setState(() {
+                              endDate = null;
+                            }))
+                    : Text('No date selected')
+              ],
             ),
           ],
         ),

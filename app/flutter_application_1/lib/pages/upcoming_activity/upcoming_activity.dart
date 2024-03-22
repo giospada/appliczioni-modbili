@@ -28,7 +28,11 @@ class UpcoingActivity extends StatelessWidget {
                 itemCount: activities.length,
                 itemBuilder: (context, index) {
                   return ActivityCardWidget(
-                      activityData: activities[index], pos: pos);
+                      onReturn: () {
+                        Navigator.pop(context);
+                      },
+                      activityData: activities[index],
+                      pos: pos);
                 }));
   }
 }

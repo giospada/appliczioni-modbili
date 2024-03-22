@@ -67,7 +67,6 @@ class _AsyncLoaderPageState extends State<AsyncLoaderPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Async Operation')),
       body: AnimatedSwitcher(
         duration: Duration(milliseconds: 500),
         child: _buildBody(),

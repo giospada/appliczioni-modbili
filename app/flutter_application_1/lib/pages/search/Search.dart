@@ -1,5 +1,6 @@
+import 'dart:html';
 import 'package:SportMates/config/auth_provider.dart';
-import 'package:SportMates/pages/search/Filters.dart';
+import 'package:SportMates/pages/feedback/history.dart';
 import 'package:SportMates/pages/search/choose_radius.dart';
 import 'package:SportMates/pages/search/filter_dialog.dart';
 import 'package:SportMates/pages/search/map_search.dart';
@@ -8,16 +9,15 @@ import 'package:SportMates/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:SportMates/data/activity.dart';
+import 'package:SportMates/data/feedback.dart';
 import 'package:SportMates/pages/general_purpuse/activity_card.dart';
 import 'package:SportMates/config/config.dart';
 import 'package:SportMates/pages/new_activity/new_activity.dart';
 import 'package:SportMates/pages/settings/settings.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:open_street_map_search_and_pick/open_street_map_search_and_pick.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:math';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -32,6 +32,8 @@ class _SearchPageState extends State<SearchPage> {
   Position? pos;
   List<Activity> activities = [];
   List<Activity> display_activities = [];
+  String token = '';
+  List<FeedbackActivity> feedback = [];
 
   double radius = 5000;
   double maxPrice = 0;
@@ -56,6 +58,19 @@ class _SearchPageState extends State<SearchPage> {
     filter();
   }
 
+  Future<void> loadFeedback() async {
+    final req = await http.get(Uri.http(Config().host, '/feedback'),
+        headers: {'Authorization': 'Bearer ${token}'});
+    if (req.statusCode != 200) {
+      throw Exception('Failed to load feedback');
+    }
+    final feedback =
+        json.decode(req.body).map((e) => FeedbackActivity.fromJson(e));
+    setState(() {
+      this.feedback = feedback.toList().cast<FeedbackActivity>();
+    });
+  }
+
   void loadIds() async {
     setState(() {
       _loading = true;
@@ -65,7 +80,7 @@ class _SearchPageState extends State<SearchPage> {
       throw Exception('Failed to load ids');
     }
     final ids = json.decode(req.body);
-
+    await loadFeedback();
     loadAllActivitys(ids.cast<int>());
   }
 
@@ -179,7 +194,10 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<AuthProvider>(context).getUsername!;
+    var temp = Provider.of<AuthProvider>(context);
+    final user = temp.getUsername!;
+    token = temp.token!;
+
     var upcoming = upcomingFilter(user, activities, pos);
     return Scaffold(
       body: Padding(
@@ -284,6 +302,12 @@ class _SearchPageState extends State<SearchPage> {
                             itemCount: display_activities.length,
                             itemBuilder: (context, index) {
                               return ActivityCardWidget(
+                                  onReturn: () {
+                                    setState(() {
+                                      activities = [];
+                                      loadIds();
+                                    });
+                                  },
                                   activityData: display_activities[index],
                                   pos: pos);
                             },
@@ -309,18 +333,28 @@ class _SearchPageState extends State<SearchPage> {
                 isLabelVisible: upcoming.isNotEmpty,
                 child: IconButton(
                   icon: Icon(Icons.upcoming),
-                  onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(
+                  onPressed: () async {
+                    await Navigator.of(context).push(MaterialPageRoute(
                         builder: (builder) =>
                             UpcoingActivity(activities: upcoming, pos: pos!)));
+                    setState(() {
+                      activities = [];
+                      loadIds();
+                    });
                   },
                 ),
               ),
               IconButton(
                 icon: Icon(Icons.history),
                 onPressed: () {
-                  Navigator.of(context).push(
-                      MaterialPageRoute(builder: (builder) => SettingsPage()));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (builder) => FeedbackPage(
+                          activities: activities
+                              .where((element) =>
+                                  element.participants.contains(user) &&
+                                  element.time.isBefore(DateTime.now()))
+                              .toList(),
+                          feedback: feedback)));
                 },
               )
             ],

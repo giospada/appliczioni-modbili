@@ -26,7 +26,7 @@ class ActivityDetailsWidget extends StatelessWidget {
 
   Future<http.Response> leave(int id) async {
     final response = await http.post(
-      Uri.http(Config().host, '/activities/$id/leave'),
+      Uri.http(Config().host, '/activity/$id/leave'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -41,7 +41,7 @@ class ActivityDetailsWidget extends StatelessWidget {
 
   Future<http.Response> delete(int id) async {
     final response = await http.delete(
-      Uri.http(Config().host, '/activities/$id'),
+      Uri.http(Config().host, '/activity/$id'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -71,7 +71,7 @@ class ActivityDetailsWidget extends StatelessWidget {
     return response;
   }
 
-  void asyncRouteOperation(
+  Future<void> asyncRouteOperation(
       BuildContext context, Future<dynamic> Function() asyncOperation) async {
     final data = await Navigator.push(
       context,
@@ -295,7 +295,7 @@ class ActivityDetailsWidget extends StatelessWidget {
           child: (activityData.creator == user)
               ? OutlinedButton(
                   onPressed: () async {
-                    asyncRouteOperation(
+                    await asyncRouteOperation(
                         context, () async => await delete(activityData.id));
                   },
                   child: Wrap(
@@ -307,8 +307,8 @@ class ActivityDetailsWidget extends StatelessWidget {
                   ))
               : isParticipant
                   ? OutlinedButton(
-                      onPressed: () {
-                        asyncRouteOperation(
+                      onPressed: () async {
+                        await asyncRouteOperation(
                             context, () async => await leave(activityData.id));
                       },
                       child: Wrap(
@@ -320,7 +320,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                       ))
                   : ElevatedButton(
                       onPressed: () async {
-                        asyncRouteOperation(
+                        await asyncRouteOperation(
                             context, () async => await join(activityData.id));
                       },
                       child: Wrap(

@@ -7,9 +7,10 @@ import 'package:geolocator/geolocator.dart';
 class ActivityCardWidget extends StatelessWidget {
   final Activity activityData;
   final Position? pos;
+  final Function? onReturn;
 
   const ActivityCardWidget(
-      {Key? key, required this.activityData, required this.pos})
+      {Key? key, required this.activityData, required this.pos, this.onReturn})
       : super(key: key);
 
   @override
@@ -19,13 +20,15 @@ class ActivityCardWidget extends StatelessWidget {
     PositionActivity positionActivity =
         PositionActivity(long: pos!.longitude, lat: pos!.latitude);
     return InkWell(
-      onTap: () {
-        // Material
-        Navigator.push(
+      onTap: () async {
+        await Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => ActivityDetailsWidget(
                     activityData: activityData, position: pos!)));
+        if (onReturn != null) {
+          onReturn!();
+        }
       },
       child: Card(
         child: Padding(
