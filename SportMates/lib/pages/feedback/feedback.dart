@@ -1,11 +1,6 @@
 import 'package:SportMates/data/activity.dart';
-import 'package:SportMates/data/feedback.dart';
-import 'package:SportMates/pages/feedback/feedback_list.dart';
-import 'package:SportMates/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:SportMates/pages/feedback/rating_stars.dart';
 
 class AddFeedbackScreen extends StatefulWidget {
   final Activity activity;

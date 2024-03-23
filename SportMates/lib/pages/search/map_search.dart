@@ -1,12 +1,10 @@
 import 'package:SportMates/data/activity.dart';
 import 'package:SportMates/pages/general_purpuse/activity_card.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:open_street_map_search_and_pick/open_street_map_search_and_pick.dart';
 
 class MapSearch extends StatefulWidget {
   Position pos;

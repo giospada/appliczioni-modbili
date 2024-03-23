@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:html';
 
 import 'package:SportMates/utils.dart';
 import 'package:flutter/material.dart';

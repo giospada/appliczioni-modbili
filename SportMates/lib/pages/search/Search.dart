@@ -1,4 +1,3 @@
-import 'dart:html';
 import 'package:SportMates/config/auth_provider.dart';
 import 'package:SportMates/pages/feedback/history.dart';
 import 'package:SportMates/pages/search/choose_radius.dart';

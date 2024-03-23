@@ -1,5 +1,3 @@
-import 'dart:js_util';
-
 import 'package:flutter/material.dart';
 import 'package:SportMates/config/auth_provider.dart';
 import 'package:SportMates/config/config.dart';

@@ -16,8 +16,11 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
-android {
-    defaultConfig {
-        minSdkVersion 20
-    }
-}
+
+ext.kotlin_version = '1.9.23'
+
+//android {
+//    defaultConfig {
+//        minSdkVersion 20
+//    }
+//}
