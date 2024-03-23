@@ -143,7 +143,7 @@ async def leave_activity(activity_id: int, db: Session = Depends(get_db), token:
     return crud.leave_activity(db,activity_id, token_data.username)
 
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-
+#if __name__ == "__main__":
+#    import uvicorn
+#    uvicorn.run(app, host="0.0.0.0", port=8000)
+#
