@@ -31,6 +31,18 @@ dependencies:
   flutter:
     sdk: flutter
 
+  flex_color_scheme: ^7.3.1
+  flutter_secure_storage: ^9.0.0
+  http: ^1.2.1
+  provider: ^6.1.2
+  open_street_map_search_and_pick: ^0.1.1
+  flutter_svg: ^2.0.10+1
+  flutter_map: ^6.1.0
+  flutter_local_notifications: ^17.0.0
+  geolocator: ^10.1.1
+  latlong2: ^0.9.0
+  flutter_map_cancellable_tile_provider: ^2.0.0
+  maps_launcher: ^2.2.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -59,9 +71,23 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+
+  assets:
+    - assets/images/logo.png
+    - assets/images/avatar.png
+    - assets/svg/basketball.svg
+    - assets/svg/football.svg
+    - assets/svg/online_calendar.svg  
+    - assets/svg/sign_up.svg
+    - assets/svg/best_place.svg  
+    - assets/svg/login.svg          
+    - assets/svg/running.svg     
+    - assets/svg/time_management.svg
+    - assets/svg/done.svg        
+    - assets/svg/navigation.svg     
+    - assets/svg/settings_tab.svg
+
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
