@@ -28,7 +28,7 @@ class Activity(Base):
     long = Column(Float)
     lat = Column(Float)
     number_of_people = Column(Integer)
-    creator = Column(Integer, ForeignKey('users.username'))
+    creator = Column(String, ForeignKey('users.username'))
     participants = relationship(
         "User",
         secondary=association_table,
