@@ -25,7 +25,7 @@ class ActivityDetailsWidget extends StatelessWidget {
 
   Future<http.Response> leave(int id) async {
     final response = await http.post(
-      Uri.http(Config().host, '/activity/$id/leave'),
+      Uri.https(Config().host, '/activity/$id/leave'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -40,7 +40,7 @@ class ActivityDetailsWidget extends StatelessWidget {
 
   Future<http.Response> delete(int id) async {
     final response = await http.delete(
-      Uri.http(Config().host, '/activity/$id'),
+      Uri.https(Config().host, '/activity/$id'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -55,7 +55,7 @@ class ActivityDetailsWidget extends StatelessWidget {
 
   Future<http.Response> join(int id) async {
     final response = await http.post(
-      Uri.http(Config().host, '/activities/register'),
+      Uri.https(Config().host, '/activities/register'),
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',

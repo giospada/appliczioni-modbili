@@ -12,20 +12,24 @@ class FeedbackPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //create a set of the activity that has
+    Map<int, FeedbackActivity> feedbackMap =
+        Map.fromIterable(feedback, key: (e) => e.activityId, value: (e) => e);
+
     return Scaffold(
         appBar: AppBar(
           title: Text('Feedback'),
         ),
-        body: (feedback.length == 0)
+        body: (activities.length == 0)
             ? Center(
                 child: Text('No feedback'),
               )
             : ListView.builder(
-                itemCount: feedback.length,
+                itemCount: activities.length,
                 itemBuilder: (context, index) {
                   return FeedbackCardWidget(
                     activityData: activities[index],
-                    feedbackData: feedback[index],
+                    feedbackData: feedbackMap[activities[index].id],
                   );
                 }));
   }

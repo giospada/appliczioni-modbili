@@ -22,7 +22,12 @@ class FeedbackCardWidget extends StatelessWidget {
         leading: Icon(sportToIcon[activityData.attributes.sport]),
         title: Text(displayFormattedDate(activityData.time)),
         subtitle: feedbackData != null
-            ? Text(feedbackData!.comment)
+            ? Column(
+                children: [
+                  Text(feedbackData!.comment),
+                  StarRatingWidget(rating: feedbackData!.rating.toDouble())
+                ],
+              )
             : ElevatedButton(
                 child: Text('Add Feedback'),
                 onPressed: () {
@@ -36,9 +41,6 @@ class FeedbackCardWidget extends StatelessWidget {
                   );
                 },
               ),
-        trailing: feedbackData != null
-            ? StarRatingWidget(rating: feedbackData!.rating.toDouble())
-            : null,
       ),
     );
   }

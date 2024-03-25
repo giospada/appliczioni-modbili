@@ -19,7 +19,7 @@ class Home extends StatelessWidget {
                 )
               : auth.isAuthenticated
                   ? SearchPage()
-                  : LoginSignupScreen(),
+                  : LoginSignupPage(),
         ),
       ),
     );

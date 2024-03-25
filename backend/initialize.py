@@ -7,7 +7,11 @@ from datetime import datetime, timedelta
 fake = Faker()
 
 # API Base URL
-BASE_URL = "http://localhost:8000"  # Replace this with the actual API URL
+BASE_URL = "https://appliczioni-modbili.vercel.app"#http://localhost:8000"  # Replace this with the actual API URL
+
+
+NUMBER_OF_USER = 4
+NUMBER_OF_ACTIVITY = 2
 
 def signup_user(username, password):
     """Signup a new user."""
@@ -36,7 +40,7 @@ def register_activity(token, username, activityId):
     return response.json()
 
 # Generate and signup users
-users = [{"username": fake.user_name(), "password": fake.password()} for _ in range(10)]
+users = [{"username": fake.user_name(), "password": fake.password()} for _ in range(NUMBER_OF_USER)]
 
 print('generated users')
 
@@ -110,13 +114,13 @@ script in js for googlemaps downlaod locations
 
 # Create activities for each user
 for token in tokens:
-    for _ in range(random.randint(1, 10)):
+    for _ in range(NUMBER_OF_ACTIVITY):
         sport = random.choice(["basketball", "football", "running"])
         time = datetime.now() + timedelta(days=random.randint(0, 7), hours=random.randint(8, 19))
         # position should be replaced with actual data
         choosed = random.randint(0,len(positions)-1)
         position = {"lat": positions[choosed][0], "long": positions[choosed][1]}
-        attributes = {"level": "beginner", "price": 0, "sport": sport}
+        attributes = {"level": "beginner", "price": random.randint(0,10), "sport": sport}
         numberOfPeople = random.randint(1, 7)
         create_activity(token, fake.sentence(), time.isoformat(), position, attributes, numberOfPeople)
 

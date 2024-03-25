@@ -1,42 +1,22 @@
 import 'package:sport_mates/config/config.dart';
+import 'package:sport_mates/pages/search/filter_data.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
 
 class DialogFilter extends StatefulWidget {
-  final String? selectedSport;
-  final bool? price;
-  final double? maxPrice;
-  final DateTime? startDate;
-  final DateTime? endDate;
-
+  final FilterData filterData;
   DialogFilter({
-    this.selectedSport,
-    this.price,
-    this.maxPrice,
-    this.startDate,
-    this.endDate,
+    required this.filterData,
   });
 
   @override
-  _DialogFilterState createState() => _DialogFilterState();
+  _DialogFilterState createState() =>
+      _DialogFilterState(filterData: filterData);
 }
 
 class _DialogFilterState extends State<DialogFilter> {
-  late String selectedSport;
-  late bool price;
-  late double maxPrice;
-  late DateTime? startDate;
-  late DateTime? endDate;
-
-  @override
-  void initState() {
-    super.initState();
-    selectedSport = widget.selectedSport ?? Config().nullSport;
-    price = widget.price ?? false;
-    maxPrice = widget.maxPrice ?? 0;
-    startDate = widget.startDate;
-    endDate = widget.endDate;
-  }
+  FilterData filterData;
+  _DialogFilterState({required this.filterData});
 
   @override
   Widget build(BuildContext context) {
@@ -53,10 +33,10 @@ class _DialogFilterState extends State<DialogFilter> {
                 const Text('Select a sport'),
                 DropdownButton<String>(
                   hint: Text('Select Sport'),
-                  value: selectedSport,
+                  value: filterData.selectedSport,
                   onChanged: (String? value) {
                     setState(() {
-                      selectedSport = value ?? Config().nullSport;
+                      filterData.selectedSport = value ?? Config().nullSport;
                     });
                   },
                   items:
@@ -71,28 +51,28 @@ class _DialogFilterState extends State<DialogFilter> {
             ),
             SwitchListTile(
               title: Text('Max Price'),
-              value: price,
+              value: filterData.price,
               onChanged: (bool value) {
                 setState(() {
-                  price = value;
+                  filterData.price = value;
                 });
               },
             ),
             AnimatedContainer(
-              height: !price ? 0 : 60,
+              height: !filterData.price ? 0 : 60,
               duration: Duration(milliseconds: 200),
-              child: price
+              child: filterData.price
                   ? Slider(
-                      value: maxPrice,
+                      value: filterData.maxPrice,
                       min: 0,
                       max: 50,
                       divisions: 10,
                       onChanged: (value) {
                         setState(() {
-                          maxPrice = value;
+                          filterData.maxPrice = value;
                         });
                       },
-                      label: maxPrice.toString(),
+                      label: filterData.maxPrice.toString(),
                     )
                   : null,
             ),
@@ -103,22 +83,23 @@ class _DialogFilterState extends State<DialogFilter> {
                   onPressed: () async {
                     final date = await showDatePicker(
                       context: context,
-                      initialDate: startDate ?? DateTime.now(),
+                      initialDate: filterData.startDate ?? DateTime.now(),
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
                     );
                     if (date != null) {
                       setState(() {
-                        startDate = date;
+                        filterData.startDate = date;
                       });
                     }
                   },
                 ),
-                (startDate != null)
+                (filterData.startDate != null)
                     ? Chip(
-                        label: Text(displayFormattedDate(startDate!)),
+                        label:
+                            Text(displayFormattedDate(filterData.startDate!)),
                         onDeleted: () => setState(() {
-                              startDate = null;
+                              filterData.startDate = null;
                             }))
                     : Text('No date selected')
               ],
@@ -130,22 +111,22 @@ class _DialogFilterState extends State<DialogFilter> {
                   onPressed: () async {
                     final date = await showDatePicker(
                       context: context,
-                      initialDate: endDate ?? DateTime.now(),
+                      initialDate: filterData.endDate ?? DateTime.now(),
                       firstDate: DateTime(2000),
                       lastDate: DateTime(2100),
                     );
                     if (date != null) {
                       setState(() {
-                        startDate = date;
+                        filterData.startDate = date;
                       });
                     }
                   },
                 ),
-                (endDate != null)
+                (filterData.endDate != null)
                     ? Chip(
-                        label: Text(displayFormattedDate(endDate!)),
+                        label: Text(displayFormattedDate(filterData.endDate!)),
                         onDeleted: () => setState(() {
-                              endDate = null;
+                              filterData.endDate = null;
                             }))
                     : Text('No date selected')
               ],
@@ -157,8 +138,7 @@ class _DialogFilterState extends State<DialogFilter> {
         ElevatedButton(
           child: Text('OK'),
           onPressed: () {
-            Navigator.of(context)
-                .pop([price, selectedSport, maxPrice, startDate, endDate]);
+            Navigator.of(context).pop(filterData);
           },
         ),
       ],

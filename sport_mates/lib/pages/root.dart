@@ -18,7 +18,7 @@ class Root extends StatelessWidget {
         darkTheme: createDarkTheme(),
         home: SplashScreen(),
         routes: {
-          '/login': (context) => LoginSignupScreen(),
+          '/login': (context) => LoginSignupPage(),
           '/home': (context) => Home(),
           '/settings': (context) => SettingsPage(),
           '/create': (context) => CreateActivityWidget(),

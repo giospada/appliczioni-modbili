@@ -1,3 +1,4 @@
+import 'package:sport_mates/pages/new_activity/layout_widget.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -127,7 +128,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
     Config config = Config();
     final token = Provider.of<AuthProvider>(context).token;
     final response = await http.post(
-      Uri.http(config.host, '/activities'),
+      Uri.https(config.host, '/activities'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token'
@@ -296,61 +297,5 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                 heroTag: 'next'),
           ],
         ));
-  }
-}
-
-class LayoutWidget extends StatelessWidget {
-  // get svg path from init
-  final String? svgPath;
-  final Widget? svgWidget;
-
-  final String title;
-  final String description;
-  final Widget child;
-
-  LayoutWidget(
-      {required this.title,
-      required this.description,
-      this.child = const SizedBox(),
-      this.svgPath,
-      this.svgWidget}) {
-    assert(svgPath != null || svgWidget != null,
-        'You must provide either a svgPath or a svgWidget');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: svgWidget != null && svgPath == null
-                ? svgWidget
-                : SvgPicture.asset(
-                    svgPath ?? '',
-                    height: 100,
-                    width: 100,
-                  ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child:
-                Text(title, style: Theme.of(context).textTheme.headlineSmall),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              description,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
-          Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 8), child: child),
-          // make extend all width
-        ],
-      ),
-    );
   }
 }

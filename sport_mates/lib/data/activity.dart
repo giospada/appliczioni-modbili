@@ -52,7 +52,7 @@ class PositionActivity {
 
 class Attributes {
   final String level;
-  final double price;
+  final int price;
   final String sport;
 
   Attributes({

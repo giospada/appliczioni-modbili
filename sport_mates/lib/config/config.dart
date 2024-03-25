@@ -10,7 +10,7 @@ class Config {
 
   Config._internal();
 
-  String get host => 'localhost:8000';
+  String get host => 'appliczioni-modbili.vercel.app';
 
   int? notifyBefore = 10;
 

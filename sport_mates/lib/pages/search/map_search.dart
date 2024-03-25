@@ -30,14 +30,12 @@ class _MapSearchState extends State<MapSearch> {
   _MapSearchState(this.pos, this.activities, this.radius);
 
   double long = 0, lat = 0;
-  int currentSelected = 0;
 
   @override
   void initState() {
     super.initState();
     long = pos.longitude;
     lat = pos.latitude;
-    currentSelected = 0;
   }
 
   PageController controller = PageController(viewportFraction: 0.8);
@@ -46,6 +44,15 @@ class _MapSearchState extends State<MapSearch> {
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant MapSearch oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    this.activities = [...widget.activities];
+    this.pos = widget.pos;
+    this.radius = widget.radius;
+    setState(() {});
   }
 
   @override
@@ -114,27 +121,26 @@ class _MapSearchState extends State<MapSearch> {
                 ),
               ]),
         ),
-        Container(
-          alignment: Alignment.bottomCenter,
-          height: 150,
-          child: PageView.builder(
-            itemCount: activities.length,
-            controller: controller,
-            onPageChanged: (int index) {
-              setState(() {
-                currentSelected = index;
-                mapController.move(
-                  LatLng(activities[index].position.lat,
-                      activities[index].position.long),
-                  15,
-                );
-              });
-            },
-            itemBuilder: (context, index) {
-              return ActivityCardWidget(
-                  activityData: activities[index], pos: pos);
-            },
-          ),
+        Wrap(
+          children: [
+            PageView.builder(
+              itemCount: activities.length,
+              controller: controller,
+              onPageChanged: (int index) {
+                setState(() {
+                  mapController.move(
+                    LatLng(activities[index].position.lat,
+                        activities[index].position.long),
+                    15,
+                  );
+                });
+              },
+              itemBuilder: (context, index) {
+                return ActivityCardWidget(
+                    activityData: activities[index], pos: pos);
+              },
+            ),
+          ],
         ),
       ],
     ));

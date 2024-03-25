@@ -1,0 +1,4 @@
+enum ActionStateLogin {
+  login,
+  signUp,
+}
