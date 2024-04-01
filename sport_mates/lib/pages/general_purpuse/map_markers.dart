@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/data/activity.dart';
+import 'package:sport_mates/utils.dart';
 
 final double ICON_SIZE = 20;
 final double ICON_PADDING = 10;
@@ -43,35 +44,38 @@ List<Clusters> _createClusters(List<Activity> activities, LatLngBounds bounds,
   return clusters;
 }
 
-Marker _createMarker(Activity activity, Function? onTap) {
-  return Marker(
-    width: ICON_SIZE + ICON_PADDING,
-    height: ICON_SIZE + ICON_PADDING,
-    point: activity.position,
-    child: Center(
-      child: (onTap != null)
-          ? IconButton(
-              onPressed: () => onTap(activity.position),
-              icon: Icon(
-                Icons.circle,
-                size: ICON_SIZE,
-              ),
-            )
-          : Icon(
-              Icons.circle,
-              size: ICON_SIZE,
-            ),
-    ),
-  );
-}
-
 List<Widget> createMarkers(
     MapController mapController,
     List<Activity> activities,
     LatLng center,
     double radius,
-    Function(LatLng)? onTap) {
+    Function(Activity)? onTap) {
   List<Marker> markers = [];
+  Marker _createMarker(Activity activity) {
+    final icon = Icon(
+      Icons.circle,
+      size: ICON_SIZE, //check if inside the radius
+      color: isInRatio(activity.position, center, radius)
+          ? Colors.grey
+          : Colors.black54,
+    );
+    return Marker(
+      width: ICON_SIZE + ICON_PADDING,
+      height: ICON_SIZE + ICON_PADDING,
+      point: activity.position,
+      child: Center(
+        child: (onTap != null)
+            ? IconButton(
+                onPressed: () => onTap(activity),
+                icon: Icon(
+                  Icons.circle,
+                  size: ICON_SIZE,
+                ),
+              )
+            : icon,
+      ),
+    );
+  }
 
   try {
     var bounds = mapController.camera.visibleBounds;
@@ -81,36 +85,46 @@ List<Widget> createMarkers(
     mapController.camera.pixelBoundsAtZoom(mapController.camera.zoom);
     markers = _createClusters(display_activities, bounds,
             mapController.camera.pixelBounds, mapController)
-        .map((cluster) => Marker(
-              width: ICON_SIZE + ICON_PADDING,
-              height: ICON_SIZE + ICON_PADDING,
-              point: mapController.camera.unproject(cluster.center),
-              child: (cluster.activities.length > 1)
-                  ? Container(
-                      height: ICON_SIZE,
-                      width: ICON_SIZE,
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          cluster.activities.length.toString(),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+        .map(
+          (cluster) => (cluster.activities.length > 1)
+              ? Marker(
+                  width: ICON_SIZE + ICON_PADDING,
+                  height: ICON_SIZE + ICON_PADDING,
+                  point: mapController.camera.unproject(cluster.center),
+                  child: InkWell(
+                      onTap: () {
+                        if (onTap != null) {
+                          onTap(cluster.activities[0]);
+                        }
+                      },
+                      child: Container(
+                          height: ICON_SIZE,
+                          width: ICON_SIZE,
+                          decoration: BoxDecoration(
+                            color: isInRatio(
+                                    mapController.camera
+                                        .unproject(cluster.center),
+                                    center,
+                                    radius)
+                                ? Colors.grey
+                                : Colors.black54,
+                            shape: BoxShape.circle,
                           ),
-                        ),
-                      ))
-                  : Icon(
-                      Icons.circle,
-                      size: ICON_SIZE,
-                    ),
-            ))
+                          child: Center(
+                            child: Text(
+                              cluster.activities.length.toString(),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ))))
+              : _createMarker(cluster.activities[0]),
+        )
         .toList();
   } catch (e) {
     print('Error $e');
-    markers = activities.map((e) => _createMarker(e, onTap)).toList();
+    markers = activities.map((e) => _createMarker(e)).toList();
   }
 
   return [

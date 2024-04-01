@@ -163,10 +163,31 @@ class ActivityDetailsWidget extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(10),
+                  padding: EdgeInsets.all(15),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                        child: Container(
+                          width: double.infinity,
+                          child: Column(
+                            children: [
+                              Text(
+                                textAlign: TextAlign.start,
+                                'Description',
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall,
+                              ),
+                              Text(
+                                activityData.description,
+                                textAlign: TextAlign.start,
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment
                             .spaceBetween, // Space between items in Row
@@ -179,7 +200,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                                 Row(
                                   children: [
                                     Icon(Icons.access_time),
-                                    SizedBox(width: 10),
+                                    SizedBox(width: 15),
                                     Text(
                                       displayFormattedDate(activityData.time),
                                     ),
@@ -189,7 +210,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                                   children: [
                                     Icon(Icons
                                         .location_on), // Replace with your icon
-                                    SizedBox(width: 10),
+                                    SizedBox(width: 15),
                                     Text(
                                       "${getMeterOrKmDistance(activityData.position, position)} distanza",
                                     ),
@@ -199,7 +220,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                                   children: [
                                     Icon(
                                         Icons.people), // Replace with your icon
-                                    SizedBox(width: 10),
+                                    SizedBox(width: 15),
                                     Text(
                                       restanti.toString(),
                                       style: TextStyle(
@@ -237,28 +258,18 @@ class ActivityDetailsWidget extends StatelessWidget {
                           ),
                         ],
                       ),
+                      Divider(),
                       Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                        child: Container(
-                          width: double.infinity,
-                          child: Column(
-                            children: [
-                              Text(
-                                textAlign: TextAlign.start,
-                                'Description',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              Text(
-                                activityData.description,
-                                textAlign: TextAlign.start,
-                              ),
-                            ],
-                          ),
+                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
+                        child: Column(
+                          children: [
+                            Text(
+                              'Participants',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                          ],
                         ),
                       ),
-                      Divider(),
                       ListView.builder(
                         shrinkWrap: true,
                         physics:
@@ -273,6 +284,21 @@ class ActivityDetailsWidget extends StatelessWidget {
                                   'https://api.dicebear.com/7.x/lorelei/png?seed=${e}',
                             ),
                             title: Text(e),
+                            trailing: (activityData.creator == e)
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context).primaryColor,
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Padding(
+                                        padding: const EdgeInsets.all(3.0),
+                                        child: Text(
+                                          'Creator',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                          ),
+                                        )))
+                                : SizedBox(),
                           );
                         },
                       ),

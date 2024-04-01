@@ -52,8 +52,13 @@ class _MapSearchState extends State<MapSearch> {
 
   @override
   Widget build(BuildContext context) {
-    var marker = createMarkers(mapController, activities, pos, radius,
-        (LatLng pos) => mapController.move(pos, 15));
+    var marker =
+        createMarkers(mapController, activities, pos, radius, (Activity t) {
+      controller.animateToPage(activities.indexOf(t),
+          duration: Duration(milliseconds: 500), curve: Curves.ease);
+      mapController.move(t.position, 15);
+    });
+
     return Stack(
       children: [
         Expanded(
@@ -92,9 +97,8 @@ class _MapSearchState extends State<MapSearch> {
             itemCount: activities.length,
             controller: controller,
             onPageChanged: (int index) {
-              setState(() {
-                pos = activities[index].position;
-              });
+              mapController.move(activities[index].position, 15);
+              setState(() {});
             },
             itemBuilder: (context, index) {
               return ActivityCardWidget(
