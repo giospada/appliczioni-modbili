@@ -1,0 +1,11 @@
+{
+  "@@locale": "en",
+  "price": "Price",
+  "distance": "Distance",
+  "@price": {
+    "description": "Label for the price filter chip."
+  },
+  "@distance": {
+    "description": "Label for the distance filter chip."
+  }
+}

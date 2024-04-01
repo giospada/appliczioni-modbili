@@ -112,6 +112,17 @@ script in js for googlemaps downlaod locations
 })();
 """
 
+possible_description=[
+  "Vivi l'emozione dello sport al {location}! Un evento imperdibile ti aspetta il {data} alle {ora}. Biglietti disponibili a partire da {prezzo}. Non perdere questa fantastica occasione di divertimento e competizione!",
+  "Scopri i migliori talenti locali in azione! Partecipa all'evento sportivo al {location}, in programma il {data}. Le competizioni iniziano alle {ora}, con biglietti a soli {prezzo}. Un'esperienza da non perdere per gli appassionati di ogni età.",
+  "Tuffati nel cuore dell'azione con la nostra competizione di {sport}! L'appuntamento è al {location} il {data}, a partire dalle {ora}. Sostieni i tuoi favoriti con biglietti a {prezzo}. Vivi l'adrenalina e il divertimento!",
+  "Partecipa a un evento che va oltre lo sport: unisciti a noi per {sport} con scopo benefico. Raccogliamo fondi al {location} il {data}, dalle {ora}. Iscrizione a soli {prezzo}. Ogni contributo fa la differenza!",
+  "Non perderti l'appuntamento con lo sport al {location}! Competizioni avvincenti ti aspettano il {data} a partire dalle {ora}. Biglietti da {prezzo}. Emozione e passione in un evento unico.",
+  "Vivi la passione dello sport in una giornata unica al {location} il {data}. Evento aperto a tutti dalle {ora}, con ingresso a {prezzo}. Una festa dello sport per famiglie, amici e appassionati.",
+  "Preparati a una sfida sportiva indimenticabile! Il {data} al {location}, dalle {ora}, con biglietti a partire da {prezzo}. Sfide, passione e divertimento: tutto in un unico grande evento."
+]
+
+
 # Create activities for each user
 for token in tokens:
     for _ in range(NUMBER_OF_ACTIVITY):
@@ -120,9 +131,17 @@ for token in tokens:
         # position should be replaced with actual data
         choosed = random.randint(0,len(positions)-1)
         position = {"lat": positions[choosed][0], "long": positions[choosed][1]}
-        attributes = {"level": "beginner", "price": random.randint(0,10), "sport": sport}
+        price = random.randint(0,10)
+        attributes = {"level": "beginner", "price":price , "sport": sport}
         numberOfPeople = random.randint(1, 7)
-        create_activity(token, fake.sentence(), time.isoformat(), position, attributes, numberOfPeople)
+        description = possible_description[random.randint(0,len(possible_description)-1)].format(
+                location=positions[choosed][2],
+                data=time.strftime("%Y-%m-%d"),
+                ora=time.strftime("%H:%M"),
+                prezzo=f"${price}",
+                sport=sport  # Optional, use only if needed
+                )
+        create_activity(token, description, time.isoformat(), position, attributes, numberOfPeople)
 
 
 

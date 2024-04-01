@@ -1,13 +1,12 @@
+import 'package:flutter/material.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:sport_mates/pages/search/filter_data.dart';
 import 'package:sport_mates/utils.dart';
-import 'package:flutter/material.dart';
 
 class DialogFilter extends StatefulWidget {
   final FilterData filterData;
-  DialogFilter({
-    required this.filterData,
-  });
+
+  DialogFilter({required this.filterData});
 
   @override
   _DialogFilterState createState() =>
@@ -16,131 +15,158 @@ class DialogFilter extends StatefulWidget {
 
 class _DialogFilterState extends State<DialogFilter> {
   FilterData filterData;
+
   _DialogFilterState({required this.filterData});
 
   @override
   Widget build(BuildContext context) {
     List<String> allSports = Config().sports + [Config().nullSport];
-    return AlertDialog(
-      title: Text('Filters'),
-      content: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: <Widget>[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Select a sport'),
-                DropdownButton<String>(
-                  hint: Text('Select Sport'),
-                  value: filterData.selectedSport,
-                  onChanged: (String? value) {
-                    setState(() {
-                      filterData.selectedSport = value ?? Config().nullSport;
-                    });
-                  },
-                  items:
-                      allSports.map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-            SwitchListTile(
-              title: Text('Max Price'),
-              value: filterData.price,
-              onChanged: (bool value) {
-                setState(() {
-                  filterData.price = value;
-                });
-              },
-            ),
-            AnimatedContainer(
-              height: !filterData.price ? 0 : 60,
-              duration: Duration(milliseconds: 200),
-              child: filterData.price
-                  ? Slider(
-                      value: filterData.maxPrice,
-                      min: 0,
-                      max: 50,
-                      divisions: 10,
-                      onChanged: (value) {
-                        setState(() {
-                          filterData.maxPrice = value;
-                        });
-                      },
-                      label: filterData.maxPrice.toString(),
-                    )
-                  : null,
-            ),
-            Row(
-              children: [
-                ElevatedButton(
-                  child: Text('Select start date'),
-                  onPressed: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: filterData.startDate ?? DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    );
-                    if (date != null) {
+    return Container(
+      padding: EdgeInsets.all(20),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text('Filters', style: Theme.of(context).textTheme.bodyLarge),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Select a sport'),
+                  DropdownButton<String>(
+                    hint: Text('Select Sport'),
+                    value: filterData.selectedSport,
+                    onChanged: (String? value) {
                       setState(() {
-                        filterData.startDate = date;
+                        filterData.selectedSport = value ?? Config().nullSport;
                       });
-                    }
-                  },
-                ),
-                (filterData.startDate != null)
-                    ? Chip(
-                        label:
-                            Text(displayFormattedDate(filterData.startDate!)),
-                        onDeleted: () => setState(() {
-                              filterData.startDate = null;
-                            }))
-                    : Text('No date selected')
-              ],
-            ),
-            Row(
-              children: [
-                ElevatedButton(
-                  child: Text('Select end date'),
-                  onPressed: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: filterData.endDate ?? DateTime.now(),
-                      firstDate: DateTime(2000),
-                      lastDate: DateTime(2100),
-                    );
-                    if (date != null) {
-                      setState(() {
-                        filterData.startDate = date;
-                      });
-                    }
-                  },
-                ),
-                (filterData.endDate != null)
-                    ? Chip(
-                        label: Text(displayFormattedDate(filterData.endDate!)),
-                        onDeleted: () => setState(() {
-                              filterData.endDate = null;
-                            }))
-                    : Text('No date selected')
-              ],
-            ),
-          ],
+                    },
+                    items:
+                        allSports.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+              SwitchListTile(
+                title: Text('Max Price'),
+                value: filterData.price,
+                onChanged: (bool value) {
+                  setState(() {
+                    filterData.price = value;
+                  });
+                },
+              ),
+              AnimatedContainer(
+                duration: Duration(milliseconds: 200),
+                child: filterData.price
+                    ? Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                        child: Column(
+                          children: [
+                            Text(
+                                'Max Price: ${filterData.maxPrice.toStringAsFixed(2)}'),
+                            Slider(
+                              value: filterData.maxPrice,
+                              min: 0,
+                              max: 50,
+                              divisions: 10,
+                              onChanged: (value) {
+                                setState(() {
+                                  filterData.maxPrice = value;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container(),
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              _buildDateSelector(
+                context: context,
+                title: 'Select start date',
+                selectedDate: filterData.startDate,
+                onDateSelected: (DateTime date) {
+                  setState(() {
+                    filterData.startDate = date;
+                  });
+                },
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              _buildDateSelector(
+                context: context,
+                title: 'Select end date',
+                selectedDate: filterData.endDate,
+                onDateSelected: (DateTime date) {
+                  setState(() {
+                    filterData.endDate = date;
+                  });
+                },
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              ElevatedButton(
+                child: Text('Apply Filters'),
+                onPressed: () => Navigator.of(context).pop(filterData),
+              ),
+            ],
+          ),
         ),
       ),
-      actions: <Widget>[
+    );
+  }
+
+  Widget _buildDateSelector(
+      {required BuildContext context,
+      required String title,
+      DateTime? selectedDate,
+      required Function(DateTime) onDateSelected}) {
+    return Wrap(
+      direction: Axis.horizontal,
+      children: [
         ElevatedButton(
-          child: Text('OK'),
-          onPressed: () {
-            Navigator.of(context).pop(filterData);
+          child: Text(title),
+          onPressed: () async {
+            final date = await showDatePicker(
+              context: context,
+              initialDate: selectedDate ?? DateTime.now(),
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2100),
+            );
+            if (date != null) {
+              onDateSelected(date);
+            }
           },
         ),
+        if (selectedDate != null)
+          SizedBox(
+            height: 5,
+            width: 5,
+          ),
+        if (selectedDate != null)
+          Chip(
+            label: Text(
+              '${selectedDate!.day}/${selectedDate.month}',
+            ),
+            onDeleted: () => setState(() {
+              if (title.contains('start')) {
+                filterData.startDate = null;
+              } else {
+                filterData.endDate = null;
+              }
+            }),
+          ),
       ],
     );
   }

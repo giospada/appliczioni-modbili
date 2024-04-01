@@ -1,3 +1,4 @@
+import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/config/auth_provider.dart';
 import 'package:sport_mates/data/activity.dart';
 import 'package:sport_mates/pages/general_purpuse/activity_card.dart';
@@ -7,7 +8,7 @@ import 'package:provider/provider.dart';
 
 class UpcoingActivity extends StatelessWidget {
   final List<Activity> activities;
-  final Position? pos;
+  final LatLng? pos;
 
   const UpcoingActivity(
       {super.key, required this.activities, required this.pos});
@@ -32,7 +33,7 @@ class UpcoingActivity extends StatelessWidget {
                         Navigator.pop(context);
                       },
                       activityData: activities[index],
-                      pos: pos);
+                      pos: LatLng(pos!.latitude, pos!.longitude));
                 }));
   }
 }

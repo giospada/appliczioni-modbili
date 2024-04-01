@@ -1,7 +1,9 @@
+import 'package:latlong2/latlong.dart';
+
 class Activity {
   final String description;
   final DateTime time;
-  final PositionActivity position;
+  final LatLng position;
   final Attributes attributes;
   final int numberOfPeople;
   final int id;
@@ -23,9 +25,9 @@ class Activity {
     return Activity(
       description: json['description'],
       time: DateTime.parse(json['time']),
-      position: PositionActivity(
-        long: json['position']['long'],
-        lat: json['position']['lat'],
+      position: LatLng(
+        json['position']['lat'],
+        json['position']['long'],
       ),
       attributes: Attributes(
         level: json['attributes']['level'],
@@ -38,16 +40,6 @@ class Activity {
       creator: json['creator'],
     );
   }
-}
-
-class PositionActivity {
-  final double long;
-  final double lat;
-
-  PositionActivity({
-    required this.long,
-    required this.lat,
-  });
 }
 
 class Attributes {

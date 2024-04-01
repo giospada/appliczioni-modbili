@@ -14,7 +14,7 @@ List<Activity> historyActivity(
 }
 
 List<Activity> upcomingFilter(
-    String user, List<Activity> activities, Position? pos) {
+    String user, List<Activity> activities, LatLng? pos) {
   return activities
       .where((element) =>
           element.time.isAfter(DateTime.now()) &&
@@ -40,7 +40,7 @@ String displayFormattedDate(DateTime date) {
   return "il ${date.day}/${date.month} alle ${date.hour}:${date.minute}";
 }
 
-Future<Position> determinePosition() async {
+Future<LatLng> determinePosition() async {
   bool serviceEnabled;
   LocationPermission permission;
 
@@ -74,7 +74,8 @@ Future<Position> determinePosition() async {
 
   // When we reach here, permissions are granted and we can
   // continue accessing the position of the device.
-  return await Geolocator.getCurrentPosition();
+  var pos = await Geolocator.getCurrentPosition();
+  return LatLng(pos.latitude, pos.longitude);
 }
 
 Future<void> scheduleNotification(DateTime scheduledDate) async {
@@ -105,34 +106,18 @@ Future<void> scheduleNotification(DateTime scheduledDate) async {
   //        UILocalNotificationDateInterpretation.absoluteTime);
 }
 
-bool isInRatio(PositionActivity p1, PositionActivity p2, double radio) {
-  double distance =
-      Geolocator.distanceBetween(p1.lat, p1.long, p2.lat, p2.long);
+bool isInRatio(LatLng p1, LatLng p2, double radio) {
+  double distance = Geolocator.distanceBetween(
+      p1.latitude, p1.longitude, p2.latitude, p2.longitude);
   return radio < distance;
 }
 
-String getMeterOrKmDistance(PositionActivity p1, PositionActivity p2) {
-  double distance =
-      Geolocator.distanceBetween(p1.lat, p1.long, p2.lat, p2.long);
+String getMeterOrKmDistance(LatLng p1, LatLng p2) {
+  double distance = Geolocator.distanceBetween(
+      p1.latitude, p1.longitude, p2.latitude, p2.longitude);
   if (distance < 1000) {
     return "${distance.toStringAsFixed(0)} m";
   } else {
     return "${(distance / 1000).toStringAsFixed(2)} km";
   }
-}
-
-Position createSimplePosition(LatLng latLong) {
-  return Position(
-    latitude: latLong.latitude,
-    longitude: latLong.longitude,
-    timestamp: DateTime.now(), // Not available
-    accuracy: 0.0, // Default to 0 for simplicity
-    altitude: 0.0, // Default to 0
-    heading: 0.0,
-    speed: 0.0,
-    speedAccuracy: 0.0, // Not available
-    floor: null, // Not available
-    isMocked: false, altitudeAccuracy: 0.0,
-    headingAccuracy: 0.0, // Default to false
-  );
 }

@@ -5,6 +5,7 @@ class FilterData {
   bool price;
   String selectedSport;
   DateTime? startDate, endDate;
+  String? search;
 
   FilterData(
       {required this.maxPrice,

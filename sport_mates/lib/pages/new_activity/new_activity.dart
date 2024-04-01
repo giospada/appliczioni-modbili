@@ -1,11 +1,14 @@
+import 'package:latlong2/latlong.dart';
+import 'package:sport_mates/pages/new_activity/pos_selector.dart';
 import 'package:sport_mates/pages/new_activity/layout_widget.dart';
+import 'package:sport_mates/pages/search/map_search.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sport_mates/config/auth_provider.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:sport_mates/pages/general_purpuse/loader.dart';
-import 'package:sport_mates/pages/general_purpuse/place_picker.dart';
+import 'package:sport_mates/pages/new_activity/new_activity.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -173,16 +176,16 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                 description: 'Pick the location of the activity',
                 child: ElevatedButton(
                   onPressed: () async {
+                    final pos = await determinePosition();
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PlacePickerWidget(),
+                        builder: (context) => PosSelectorWidget(pos),
                       ),
-                    );
+                    ) as LatLng;
                     if (result != null) {
-                      long = result['long'];
-                      lati = result['lat'];
-                      address = result['address'];
+                      long = result.longitude;
+                      lati = result.latitude;
                     }
                   },
                   child: Column(

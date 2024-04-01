@@ -16,7 +16,7 @@ import 'package:provider/provider.dart';
 
 class ActivityDetailsWidget extends StatelessWidget {
   Activity activityData;
-  Position position;
+  LatLng position;
 
   ActivityDetailsWidget(
       {super.key, required this.activityData, required this.position});
@@ -93,8 +93,6 @@ class ActivityDetailsWidget extends StatelessWidget {
     final String user =
         Provider.of<AuthProvider>(context, listen: false).getUsername!;
     final bool isParticipant = activityData.participants.contains(user);
-    final PositionActivity positionActivity =
-        PositionActivity(long: position.longitude, lat: position.latitude);
 
     int restanti =
         (activityData.numberOfPeople - activityData.participants.length);
@@ -113,8 +111,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                     children: [
                       FlutterMap(
                           options: MapOptions(
-                            initialCenter: LatLng(activityData.position.lat,
-                                activityData.position.long),
+                            initialCenter: activityData.position,
                             initialZoom: 13.0,
                           ),
                           children: [
@@ -127,8 +124,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                               Marker(
                                 width: 80.0,
                                 height: 80.0,
-                                point: LatLng(activityData.position.lat,
-                                    activityData.position.long),
+                                point: activityData.position,
                                 child: IconButton(
                                   icon: Icon(
                                     Icons.location_on,
@@ -137,8 +133,8 @@ class ActivityDetailsWidget extends StatelessWidget {
                                   ),
                                   onPressed: () {
                                     MapsLauncher.launchCoordinates(
-                                        activityData.position.lat,
-                                        activityData.position.long);
+                                        activityData.position.latitude,
+                                        activityData.position.longitude);
                                   },
                                 ),
                               ),
@@ -195,7 +191,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                                         .location_on), // Replace with your icon
                                     SizedBox(width: 10),
                                     Text(
-                                      "${getMeterOrKmDistance(activityData.position, positionActivity)} distanza",
+                                      "${getMeterOrKmDistance(activityData.position, position)} distanza",
                                     ),
                                   ],
                                 ),

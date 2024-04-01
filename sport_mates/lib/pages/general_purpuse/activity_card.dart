@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/data/activity.dart';
 import 'package:sport_mates/pages/general_purpuse/activity_details.dart';
 import 'package:sport_mates/utils.dart';
@@ -6,7 +7,7 @@ import 'package:geolocator/geolocator.dart';
 
 class ActivityCardWidget extends StatelessWidget {
   final Activity activityData;
-  final Position? pos;
+  final LatLng? pos;
   final Function? onReturn;
 
   const ActivityCardWidget(
@@ -17,8 +18,7 @@ class ActivityCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     int restanti =
         (activityData.numberOfPeople - activityData.participants.length);
-    PositionActivity positionActivity =
-        PositionActivity(long: pos!.longitude, lat: pos!.latitude);
+
     return InkWell(
       onTap: () async {
         await Navigator.push(
@@ -51,8 +51,14 @@ class ActivityCardWidget extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        Text(activityData.description),
+                        Text(
+                          activityData.description,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                       ],
                     ),
                   )
@@ -65,7 +71,7 @@ class ActivityCardWidget extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                          "${getMeterOrKmDistance(activityData.position, positionActivity)} distanza"),
+                          "${getMeterOrKmDistance(activityData.position, pos!)} distanza"),
                       SizedBox(width: 10),
                       (activityData.attributes.price == 0)
                           ? Text(

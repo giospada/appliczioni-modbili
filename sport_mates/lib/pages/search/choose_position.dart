@@ -1,55 +1,42 @@
+import 'dart:html';
+import 'dart:math';
+import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:sport_mates/data/activity.dart';
+import 'package:sport_mates/pages/general_purpuse/map_markers.dart';
+import 'package:sport_mates/pages/general_purpuse/maps_search.dart';
 
-import 'package:sport_mates/data/restartable_task.dart';
+import 'package:sport_mates/utils.dart';
 
 class RadiusSelectorWidget extends StatefulWidget {
-  Position position;
+  LatLng position;
   double radius;
+  List<Activity> activities = [];
 
-  RadiusSelectorWidget(this.position, this.radius);
+  RadiusSelectorWidget(this.position, this.radius, this.activities);
 
   @override
   State<RadiusSelectorWidget> createState() =>
-      _RadiusSelectorWidgetState(position, radius);
+      _RadiusSelectorWidgetState(position, radius, activities);
 }
 
 class _RadiusSelectorWidgetState extends State<RadiusSelectorWidget> {
-  Position position;
-  double long = 0, lat = 0;
+  LatLng center;
   double radius = 1000;
   MapController mapController = MapController();
+  List<Activity> activities = [];
 
-  _RadiusSelectorWidgetState(this.position, this.radius);
+  _RadiusSelectorWidgetState(this.center, this.radius, this.activities);
 
-  var taskManager = RestartableAsyncTask<dynamic>();
+  CancelableOperation? cancelableOperation;
 
   @override
   void initState() {
-    long = position.longitude;
-    lat = position.latitude;
     super.initState();
-  }
-
-  Future<dynamic> _search(controller) async {
-    await Future.delayed(Duration(seconds: 1));
-    final response = await http.get(
-      Uri.parse(
-          'https://nominatim.openstreetmap.org/search?q=${controller.text}&format=json&polygon_geojson=1&addressdetails=1'),
-    );
-
-    if (response.statusCode == 200) {
-      List<dynamic> suggestions = jsonDecode(response.body);
-
-      return suggestions;
-    } else {
-      return [];
-    }
   }
 
   @override
@@ -62,108 +49,69 @@ class _RadiusSelectorWidgetState extends State<RadiusSelectorWidget> {
             child: Stack(
               children: [
                 FlutterMap(
-                  mapController: mapController,
-                  options: MapOptions(
-                      initialCenter:
-                          LatLng(position.latitude, position.longitude),
-                      initialZoom: 13.0,
-                      onMapReady: () {
-                        mapController.mapEventStream.listen((event) {
-                          if (event is MapEventMove) {
-                            event = event as MapEventMove;
-                            setState(() {
-                              lat = event.camera.center.latitude;
-                              long = event.camera.center.longitude;
-                            });
-                          }
-                          if (event is MapEventScrollWheelZoom) {
-                            event = event as MapEventScrollWheelZoom;
-                            setState(() {
-                              lat = event.camera.center.latitude;
-                              long = event.camera.center.longitude;
-                            });
-                          }
-                          if (event is MapEventDoubleTapZoom) {
-                            event = event as MapEventDoubleTapZoom;
-                            setState(() {
-                              lat = event.camera.center.latitude;
-                              long = event.camera.center.longitude;
-                            });
-                          }
-                        });
-                      }),
-                  children: [
-                    TileLayer(
-                      urlTemplate:
-                          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                    ),
-                    MarkerLayer(
-                      markers: [
-                        Marker(
-                          width: 80.0,
-                          height: 80.0,
-                          point: LatLng(lat, long),
-                          child: Container(
-                            child: Icon(
-                              Icons.location_on,
-                              size: 50,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    CircleLayer(
-                      circles: [
-                        CircleMarker(
-                          point: LatLng(lat, long),
-                          radius: radius,
-                          useRadiusInMeter: true,
-                          borderColor: Color.fromRGBO(8, 8, 8, 0.719),
-                          borderStrokeWidth: 1.0,
-                          color: Color.fromRGBO(146, 146, 146, 0.216),
-                        ),
-                      ],
-                    ),
-                  ],
+                    mapController: mapController,
+                    options: MapOptions(
+                        initialCenter: center,
+                        initialZoom: 13.0,
+                        onMapReady: () {
+                          mapController.mapEventStream.listen((event) {
+                            if (event is MapEventMove) {
+                              event = event as MapEventMove;
+                              setState(() {
+                                center = LatLng(event.camera.center.latitude,
+                                    event.camera.center.longitude);
+                              });
+                            }
+                            if (event is MapEventScrollWheelZoom) {
+                              event = event as MapEventScrollWheelZoom;
+                              setState(() {
+                                center = LatLng(event.camera.center.latitude,
+                                    event.camera.center.longitude);
+                              });
+                            }
+                            if (event is MapEventDoubleTapZoom) {
+                              event = event as MapEventDoubleTapZoom;
+                              setState(() {
+                                center = LatLng(event.camera.center.latitude,
+                                    event.camera.center.longitude);
+                              });
+                            }
+                          });
+                        }),
+                    children: [
+                          TileLayer(
+                            urlTemplate:
+                                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                          ) as Widget
+                        ] +
+                        createMarkers(
+                            mapController, activities, center, radius, null)),
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  right: 8,
+                  child: MapSearchBar(
+                    onSearch: (lat, long) {
+                      mapController.move(
+                          LatLng(lat, long), mapController.camera.zoom);
+                    },
+                  ),
                 ),
                 Positioned(
-                  top: 0,
-                  child: SearchAnchor(
-                      suggestionsBuilder: (context, controller) async {
-                    if (controller.text.isEmpty) {
-                      return [];
-                    }
-                    var suggestions = await taskManager
-                        .run(() async => await _search(controller));
-
-                    if (suggestions.isEmpty) {
-                      return [Text('No results found')];
-                    }
-                    return suggestions.map((suggestion) {
-                      return ListTile(
-                        title: Text(suggestion['display_name']),
-                        leading: Text('${controller.text}📍'),
-                        onTap: () {
-                          double lat = double.parse(suggestion['lat']);
-                          double lon = double.parse(suggestion['lon']);
-                          mapController.move(
-                              LatLng(lat, lon), mapController.camera.zoom);
-                          Navigator.of(context).pop();
-                        },
-                      );
-                    }).toList();
-                  }, builder:
-                          (BuildContext context, SearchController controller) {
-                    return SearchBar(
-                      onTap: () {
-                        controller.openView();
+                  bottom: 10,
+                  right: 10,
+                  child: Container(
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(color: Colors.white60),
+                    child: IconButton(
+                      icon: Icon(Icons.my_location),
+                      onPressed: () async {
+                        LatLng pos = await determinePosition();
+                        mapController.move(pos, mapController.camera.zoom);
                       },
-                      onChanged: (_) {
-                        controller.openView();
-                      },
-                    );
-                  }),
-                )
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -192,7 +140,7 @@ class _RadiusSelectorWidgetState extends State<RadiusSelectorWidget> {
                 ),
                 ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pop({radius, LatLng(lat, long)});
+                      Navigator.of(context).pop({radius, center});
                     },
                     child: const Text('Choose')),
               ],

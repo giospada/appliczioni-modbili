@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/config/auth_provider.dart';
 import 'package:sport_mates/pages/feedback/history.dart';
 import 'package:sport_mates/pages/general_purpuse/activity_card.dart';
@@ -29,7 +30,7 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   bool _loading = true;
 
-  Position? pos;
+  LatLng? pos;
   double radius = 5000;
   List<Activity> activities = [];
   List<Activity> displayActivities = [];
@@ -40,13 +41,15 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
 
   FilterData filterData = FilterData.init();
 
-  void displayFilters(BuildContext context) async {
-    var data = await showDialog(
+  Future<void> displayFilters(BuildContext context) async {
+    var data = await showModalBottomSheet(
       context: context,
-      builder: (BuildContext context) {
-        return DialogFilter(filterData: filterData);
-      },
+      builder: (context) => DialogFilter(filterData: filterData),
+      isScrollControlled:
+          true, // To make the bottom sheet take full screen height if necessary
     );
+    if (data == null) return;
+
     filterState(data);
   }
 
@@ -93,10 +96,10 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
 
   Future<void> choosePositionRadius() async {
     var chosenRadius = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (builder) => RadiusSelectorWidget(pos!, radius)));
+        builder: (builder) => RadiusSelectorWidget(pos!, radius, activities)));
 
     radius = chosenRadius.elementAt(0);
-    pos = createSimplePosition(chosenRadius.elementAt(1));
+    pos = chosenRadius.elementAt(1);
 
     filterState(filterData);
   }
@@ -130,8 +133,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
           return false;
         }
       }
-      if (isInRatio(element.position,
-          PositionActivity(long: pos!.longitude, lat: pos!.latitude), radius)) {
+      if (isInRatio(element.position, pos!, radius)) {
         return false;
       }
       if (filterData.selectedSport != Config().nullSport) {
@@ -185,51 +187,59 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              SearchAnchor(suggestionsBuilder: (context, controller) {
-                return [
-                  ListTile(
-                      title: Text('Set Position and Radius'),
-                      leading: Icon(Icons.location_on),
-                      onTap: choosePositionRadius),
-                  ListTile(
-                    title: Text('Set Filters'),
-                    leading: Icon(Icons.tune),
-                    onTap: () => displayFilters(context),
-                  ),
-                  Divider(),
-                ];
-              }, builder: (BuildContext context, SearchController controller) {
-                return SearchBar(
-                  controller: controller,
-                  padding: const MaterialStatePropertyAll<EdgeInsets>(
-                      EdgeInsets.symmetric(horizontal: 16.0)),
-                  onTap: () {
-                    controller.openView();
-                  },
-                  onChanged: (_) {
-                    controller.openView();
-                  },
-                  leading: const Icon(Icons.search),
-                  trailing: <Widget>[
-                    Tooltip(
-                        message: 'Set Filters',
-                        child: Badge(
-                          isLabelVisible: filterData.hasFilter(),
-                          child: IconButton(
-                            onPressed: () => displayFilters(context),
-                            icon: const Icon(Icons.tune),
-                          ),
-                        )),
-                    Tooltip(
-                      message: 'Set Position and Radius',
-                      child: IconButton(
-                        onPressed: choosePositionRadius,
-                        icon: const Icon(Icons.location_on),
-                      ),
-                    )
-                  ],
-                );
-              }),
+              SearchAnchor.bar(
+                isFullScreen: true,
+                suggestionsBuilder: (context, controller) {
+                  return [
+                        ListTile(
+                            title: Text('Set Position and Radius'),
+                            leading: Icon(Icons.location_on),
+                            onTap: choosePositionRadius),
+                        ListTile(
+                          title: Text('Set Filters'),
+                          leading: Icon(Icons.tune),
+                          onTap: () async {
+                            await displayFilters(context);
+                            controller.closeView(controller.text ?? "");
+                          },
+                        ),
+                        Divider(),
+                      ] +
+                      displayActivities
+                          .where((element) =>
+                              element.description
+                                  .toLowerCase()
+                                  .contains(controller.text.toLowerCase()) ||
+                              element.participants.any((element) => element
+                                  .toLowerCase()
+                                  .contains(controller.text.toLowerCase())))
+                          .map((e) => ActivityCardWidget(
+                              activityData: e,
+                              pos: pos,
+                              onReturn: () =>
+                                  controller.closeView(controller.text ?? "")))
+                          .toList();
+                },
+                barLeading: const Icon(Icons.search),
+                barTrailing: <Widget>[
+                  Tooltip(
+                      message: 'Set Filters',
+                      child: Badge(
+                        isLabelVisible: filterData.hasFilter(),
+                        child: IconButton(
+                          onPressed: () => displayFilters(context),
+                          icon: const Icon(Icons.tune),
+                        ),
+                      )),
+                  Tooltip(
+                    message: 'Set Position and Radius',
+                    child: IconButton(
+                      onPressed: choosePositionRadius,
+                      icon: const Icon(Icons.location_on),
+                    ),
+                  )
+                ],
+              ),
               TabBar(
                 controller: _tabController,
                 tabs: [
@@ -245,25 +255,27 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                 child: TabBarView(controller: _tabController, children: [
                   (_loading || pos == null)
                       ? Center(child: CircularProgressIndicator())
-                      : Expanded(
-                          child: RefreshIndicator(
-                            onRefresh: () {
-                              return load();
-                            },
-                            child: ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: displayActivities.length,
-                              itemBuilder: (context, index) {
-                                return ActivityCardWidget(
-                                    onReturn: () {
-                                      load();
-                                    },
-                                    activityData: displayActivities[index],
-                                    pos: pos);
+                      : (displayActivities.length == 0)
+                          ? Center(
+                              child: Text(
+                                  'No activities founds, try to change the filters or the position'))
+                          : RefreshIndicator(
+                              onRefresh: () {
+                                return load();
                               },
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: displayActivities.length,
+                                itemBuilder: (context, index) {
+                                  return ActivityCardWidget(
+                                      onReturn: () {
+                                        load();
+                                      },
+                                      activityData: displayActivities[index],
+                                      pos: pos!);
+                                },
+                              ),
                             ),
-                          ),
-                        ),
                   (_loading || pos == null)
                       ? Center(child: CircularProgressIndicator())
                       : MapSearch(
