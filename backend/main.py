@@ -1,9 +1,11 @@
+from datetime import datetime
 from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List,Optional
 import  crud, models, schemas, database, auth
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.middleware.cors import CORSMiddleware
+from datetime import datetime
 
 models.Base.metadata.create_all(bind=database.engine)
 
@@ -66,13 +68,17 @@ def create_activity(activity: schemas.ActivityCreate, db: Session = Depends(get_
     token_data = auth.verify_token(token, credentials_exception)
     return crud.create_activity(db=db, activity=activity, username=token_data.username).toActivityBase()
 
+
+@app.get("/activities_delete", response_model=List[schemas.Activity])
+def get_deleted_activities(db: Session = Depends(get_db), date: Optional[datetime] = None):
+    return crud.get_deleted_activities(db)
+
+
 @app.get("/activities/search", response_model=List[int])
 def search_for_activities(
-        sport: Optional[str] = None, level: Optional[str] = None,
-        price: Optional[int] = None, long: Optional[float] = None,
-        lat: Optional[float] = None, radius: Optional[int] = None,
+        last_update: Optional[datetime] = None,
         db: Session = Depends(get_db)):
-    activities = crud.search_activities(db, sport, level, price, long, lat, radius)
+    activities = crud.search_activities(db, last_update)
     return [activity.id for activity in activities]
 
 @app.post("/activities/register", response_model=schemas.Message)

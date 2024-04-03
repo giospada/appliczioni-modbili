@@ -1,8 +1,11 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sport_mates/data/activity.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:sport_mates/main.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 List<Activity> historyActivity(
     String user, List<Activity> activities, Position? pos) {
@@ -84,26 +87,23 @@ Future<void> scheduleNotification(DateTime scheduledDate) async {
   if (config.notifyBefore == null) {
     return;
   }
-  //var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-  //  'your channel id',
-  //  'your channel name',
-  //  'your channel description',
-  //  importance: Importance.max,
-  //  priority: Priority.high,
-  //);
-  ////var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-  //var platformChannelSpecifics = NotificationDetails(
-  //    android: androidPlatformChannelSpecifics, iOS: iOSPlatformChannelSpecifics);
+  var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+    'your channel id',
+    'your channel name',
+    importance: Importance.max,
+    priority: Priority.high,
+  );
+  var platformChannelSpecifics =
+      NotificationDetails(android: androidPlatformChannelSpecifics);
 
-  //await flutterLocalNotificationsPlugin.zonedSchedule(
-  //    0,
-  //    'Scheduled Notification Title',
-  //    'Scheduled Notification Body',
-  //    tz.TZDateTime.from(scheduledDate, tz.local),
-  //    platformChannelSpecifics,
-  //    androidAllowWhileIdle: true,
-  //    uiLocalNotificationDateInterpretation:
-  //        UILocalNotificationDateInterpretation.absoluteTime);
+  await flutterLocalNotificationsPlugin.zonedSchedule(
+      0,
+      'Scheduled Notification Title',
+      'Scheduled Notification Body',
+      tz.TZDateTime.from(scheduledDate, tz.local),
+      platformChannelSpecifics,
+      uiLocalNotificationDateInterpretation:
+          UILocalNotificationDateInterpretation.absoluteTime);
 }
 
 bool isInRatio(LatLng p1, LatLng p2, double radio) {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sport_mates/pages/home.dart';
 import 'package:sport_mates/pages/home.dart';
 import 'dart:math';
@@ -43,6 +44,7 @@ class _SplashScreenState extends State<SplashScreen>
     // Wait for the animation to finish
     await Future.delayed(Duration(seconds: 2));
     // Navigate to the next page
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => Home()),

@@ -33,7 +33,13 @@ def delete_activity(db: Session, activity_id: int,username:str):
         raise Exception("Activity not found")
     if activity.creator != username:
         raise Exception("User not authorized to delete activity")
+
+    db.add(models.DeletedActivity(
+        activity_id=activity.id,
+        last_update=datetime.now(),
+    ))
     db.delete(activity)
+
     db.commit()
 
 def leave_activity(db: Session, activity_id: int, username: str):
@@ -46,6 +52,7 @@ def leave_activity(db: Session, activity_id: int, username: str):
     if user not in activity.participants:
         raise Exception("User not in activity")
     activity.participants.remove(user)
+    activity.last_update = datetime.now()
     db.commit()
 
 def create_activity(db: Session, activity: schemas.ActivityCreate, username: str):
@@ -63,6 +70,7 @@ def create_activity(db: Session, activity: schemas.ActivityCreate, username: str
             sport=activity.attributes.sport,
             number_of_people=activity.numberOfPeople ,
             creator=username,
+            last_update=datetime.now(),
             participants=[db_user])
     db.add(db_activity)
     db.commit()
@@ -79,6 +87,7 @@ def register_for_activity(db: Session, username: str, activity_id: int):
     if db_user in db_activity.participants:
         raise HTTPException(status_code=400, detail="User already registered for this activity")
     db_activity.participants.append(db_user)
+    db_activity.last_update = datetime.now()
     db.commit()
     return {"message": "Registration successful"}
 
@@ -108,21 +117,17 @@ def km_distance(long1: float, lat1: float, long2: float, lat2: float):
     a = 0.5 - math.cos((lat2 - lat1) * p)/2 + math.cos(lat1 * p) * math.cos(lat2 * p) * (1 - math.cos((long2 - long1) * p)) / 2
     return 12742 * math.asin(math.sqrt(a))
 
-def search_activities(db: Session, sport: Optional[str] = None, level: Optional[str] = None, price: Optional[int] = None, long: Optional[float] = None, lat: Optional[float] = None, radius: Optional[int] = None):
-    # For simplicity, this example does not implement actual geolocation-based searching.
-    # A real implementation would require geospatial queries which SQLite does not support natively.
-    # You might use PostGIS with PostgreSQL for a production scenario.
+def search_activities(db: Session, date:Optional[datetime]):
     db_activities = db.query(models.Activity)
-    if sport:
-        db_activities = db_activities.filter(models.Activity.sport == sport)
-    if level:
-        db_activities = db_activities.filter(models.Activity.level == level)
-    if price:
-        db_activities = db_activities.filter(models.Activity.price == price)
-    if long and lat and radius:
-        db_activities = db_activities.filter(km_distance(long, lat, models.Activity.long, models.Activity.lat) <= radius)
-    
-    return db_activities.all()
+    if date:
+        db_activities= db_activities.filter(models.Activity.time >= date).all()
+    return db_activities
+
+def get_deleted_activities(db: Session, date:Optional[datetime]):
+    db_activities = db.query(models.DeletedActivity)
+    if date:
+        db_activities= db_activities.filter(models.Activity.last_update >= date).all()
+    return db_activities
 
 def get_activity_feedback(db: Session, username: str):
     db_user = get_user_by_username(db, username=username)

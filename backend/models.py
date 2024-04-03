@@ -29,6 +29,7 @@ class Activity(Base):
     lat = Column(Float)
     number_of_people = Column(Integer)
     creator = Column(String, ForeignKey('users.username'))
+    last_update = Column(DateTime, default=datetime.now())
     participants = relationship(
         "User",
         secondary=association_table,
@@ -62,3 +63,10 @@ class Feedback(Base):
     rating = Column(Integer)
     comment = Column(String)
 
+
+class DeletedActivity(Base):
+    __tablename__ = "deleted_activities"
+
+    id = Column(Integer, primary_key=True, index=True)
+    activity_id = Column(Integer, ForeignKey('activities.id'))
+    last_update = Column(DateTime, default=datetime.now())

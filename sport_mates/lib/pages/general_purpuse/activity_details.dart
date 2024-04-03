@@ -313,45 +313,52 @@ class ActivityDetailsWidget extends StatelessWidget {
       ),
       persistentFooterButtons: [
         Center(
-          child: (activityData.creator == user)
-              ? OutlinedButton(
+          child: isParticipant
+              ? Row(children: [
+                  (activityData.creator == user)
+                      ? OutlinedButton(
+                          onPressed: () async {
+                            await asyncRouteOperation(context,
+                                () async => await delete(activityData.id));
+                          },
+                          child: Wrap(
+                            children: [
+                              Icon(Icons.delete, size: 20),
+                              SizedBox(width: 10),
+                              Text('Delete Activity'),
+                            ],
+                          ))
+                      : OutlinedButton(
+                          onPressed: () async {
+                            await asyncRouteOperation(context,
+                                () async => await leave(activityData.id));
+                          },
+                          child: Wrap(
+                            children: [
+                              Icon(Icons.exit_to_app, size: 20),
+                              SizedBox(width: 10),
+                              Text('Leave Activity'),
+                            ],
+                          )),
+                  IconButton(
+                      onPressed: () {
+                        scheduleNotification(activityData.time);
+                      },
+                      icon: Icon(Icons.notification_add))
+                ])
+              : ElevatedButton(
                   onPressed: () async {
                     await asyncRouteOperation(
-                        context, () async => await delete(activityData.id));
+                        context, () async => await join(activityData.id));
                   },
                   child: Wrap(
                     children: [
-                      Icon(Icons.delete, size: 20),
+                      Icon(Icons.add, size: 20),
                       SizedBox(width: 10),
-                      Text('Delete Activity'),
+                      Text('Join Activity'),
                     ],
-                  ))
-              : isParticipant
-                  ? OutlinedButton(
-                      onPressed: () async {
-                        await asyncRouteOperation(
-                            context, () async => await leave(activityData.id));
-                      },
-                      child: Wrap(
-                        children: [
-                          Icon(Icons.exit_to_app, size: 20),
-                          SizedBox(width: 10),
-                          Text('Leave Activity'),
-                        ],
-                      ))
-                  : ElevatedButton(
-                      onPressed: () async {
-                        await asyncRouteOperation(
-                            context, () async => await join(activityData.id));
-                      },
-                      child: Wrap(
-                        children: [
-                          Icon(Icons.add, size: 20),
-                          SizedBox(width: 10),
-                          Text('Join Activity'),
-                        ],
-                      ),
-                    ),
+                  ),
+                ),
         ),
       ],
     );
