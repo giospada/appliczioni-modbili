@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/config/auth_provider.dart';
+import 'package:sport_mates/config/data_provider.dart';
 import 'package:sport_mates/pages/feedback/history.dart';
 import 'package:sport_mates/pages/general_purpuse/activity_card.dart';
 import 'package:sport_mates/pages/search/choose_position.dart';
@@ -22,24 +23,38 @@ import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class SearchPage extends StatefulWidget {
+class SearchPage extends StatelessWidget {
   @override
-  State<SearchPage> createState() => _SearchPageState();
+  Widget build(BuildContext context) {
+    final dataprovider = Provider.of<DataProvider>(context);
+    dataprovider.isFirstLoad = true;
+    return Consumer<DataProvider>(builder: (context, dataProvider, child) {
+      return _SearchPage(dataProvider);
+    });
+  }
 }
 
-class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
-  bool _loading = true;
+class _SearchPage extends StatefulWidget {
+  DataProvider dataProvider;
 
+  _SearchPage(this.dataProvider);
+
+  @override
+  State<_SearchPage> createState() => _SearchPageState(dataProvider);
+}
+
+class _SearchPageState extends State<_SearchPage>
+    with TickerProviderStateMixin {
   LatLng? pos;
   double radius = 5000;
-  List<Activity> activities = [];
   List<Activity> displayActivities = [];
   String token = '';
-  List<FeedbackActivity> feedback = [];
 
   late TabController _tabController;
-
   FilterData filterData = FilterData.init();
+  DataProvider dataProvider;
+
+  _SearchPageState(this.dataProvider);
 
   Future<void> displayFilters(BuildContext context) async {
     var data = await showModalBottomSheet(
@@ -56,47 +71,14 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   void filterState(FilterData data) {
     setState(() {
       filterData = data;
-      displayActivities = filter(filterData, activities);
+      displayActivities = filter(filterData, dataProvider.activities);
     });
-  }
-
-  Future<List<FeedbackActivity>> loadFeedback() async {
-    final req = await http.get(Uri.https(Config().host, '/feedback'),
-        headers: {'Authorization': 'Bearer ${token}'});
-    if (req.statusCode != 200) {
-      throw Exception('Failed to load feedback');
-    }
-    final feedback =
-        json.decode(req.body).map((e) => FeedbackActivity.fromJson(e));
-    return feedback.toList().cast<FeedbackActivity>();
-  }
-
-  Future<void> load() async {
-    setState(() {
-      this.activities = [];
-      displayActivities = [];
-      _loading = true;
-      this.feedback = [];
-    });
-    try {
-      var ids = await loadIds();
-      var feedback = await loadFeedback();
-      var activities = await loadAllActivitys(ids.cast<int>());
-      var displayActivitis = filter(filterData, activities);
-      setState(() {
-        this.activities = activities;
-        this.feedback = feedback;
-        this.displayActivities = displayActivitis;
-        _loading = false;
-      });
-    } catch (e) {
-      print(e);
-    }
   }
 
   Future<void> choosePositionRadius() async {
     var chosenRadius = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (builder) => RadiusSelectorWidget(pos!, radius, activities)));
+        builder: (builder) =>
+            RadiusSelectorWidget(pos!, radius, dataProvider.activities)));
 
     radius = chosenRadius.elementAt(0);
     pos = chosenRadius.elementAt(1);
@@ -104,67 +86,22 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
     filterState(filterData);
   }
 
-  Future<List<int>> loadIds() async {
-    final req = await http.get(Uri.https(Config().host, '/activities/search'));
-    if (req.statusCode != 200) {
-      throw Exception('Failed to load ids');
-    }
-    return json.decode(req.body).cast<int>();
-  }
-
-  Future<List<Activity>> loadAllActivitys(List<int> ids) async {
-    var futures = ids.map((e) async {
-      var value = await http.get(Uri.https(Config().host, '/activities/$e'));
-      if (value.statusCode == 200) {
-        return (Activity.fromJson(json.decode(value.body)));
-      }
-    }).toList();
-    var result = await Future.wait(futures);
-    return result.cast<Activity>();
-  }
-
   List<Activity> filter(FilterData newFilterData, List<Activity> activities) {
     return displayActivities = activities.where((element) {
-      if (element.numberOfPeople - element.participants.length <= 0) {
-        return false;
-      }
-      if (filterData.price) {
-        if (element.attributes.price > filterData.maxPrice) {
-          return false;
-        }
-      }
-      if (isInRatio(element.position, pos!, radius)) {
-        return false;
-      }
-      if (filterData.selectedSport != Config().nullSport) {
-        if (element.attributes.sport != filterData.selectedSport) {
-          return false;
-        }
-      }
-      if (DateTime.now().isAfter(element.time)) {
-        return false;
-      }
-      if (filterData.startDate != null &&
-          filterData.startDate!.isAfter(element.time)) {
-        return false;
-      }
-      if (filterData.endDate != null &&
-          filterData.endDate!.isBefore(element.time)) {
-        return false;
-      }
-      return true;
+      return newFilterData.isValidActivity(element, pos, radius);
     }).toList();
   }
 
   Future<void> start() async {
     pos = await determinePosition();
-    load();
+    filterState(filterData);
   }
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    dataProvider.loading = true;
     start();
   }
 
@@ -176,11 +113,16 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    var temp = Provider.of<AuthProvider>(context);
-    final user = temp.getUsername!;
-    token = temp.token!;
+    var authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.getUsername!;
+    token = authProvider.token!;
 
-    var upcoming = upcomingFilter(user, activities, pos);
+    if (dataProvider.isFirstLoad) {
+      dataProvider.load(token);
+    }
+
+    var upcoming = upcomingFilter(user, dataProvider.activities, pos);
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -253,15 +195,15 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
               ),
               Expanded(
                 child: TabBarView(controller: _tabController, children: [
-                  (_loading || pos == null)
+                  (dataProvider.loading || pos == null)
                       ? Center(child: CircularProgressIndicator())
                       : (displayActivities.length == 0)
                           ? Center(
                               child: Text(
                                   'No activities founds, try to change the filters or the position'))
                           : RefreshIndicator(
-                              onRefresh: () {
-                                return load();
+                              onRefresh: () async {
+                                Provider.of<DataProvider>(context).load(token);
                               },
                               child: ListView.builder(
                                 shrinkWrap: true,
@@ -269,14 +211,15 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                                 itemBuilder: (context, index) {
                                   return ActivityCardWidget(
                                       onReturn: () {
-                                        load();
+                                        Provider.of<DataProvider>(context)
+                                            .load(token);
                                       },
                                       activityData: displayActivities[index],
                                       pos: pos!);
                                 },
                               ),
                             ),
-                  (_loading || pos == null)
+                  (dataProvider.loading || pos == null)
                       ? Center(child: CircularProgressIndicator())
                       : MapSearch(
                           pos: pos!,
@@ -304,29 +247,29 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                 isLabelVisible: upcoming.isNotEmpty,
                 child: IconButton(
                   icon: Icon(Icons.upcoming),
-                  onPressed: (_loading)
+                  onPressed: (dataProvider.loading)
                       ? null
                       : () async {
                           await Navigator.of(context).push(MaterialPageRoute(
                               builder: (builder) => UpcoingActivity(
                                   activities: upcoming, pos: pos!)));
-                          load();
+                          await Provider.of<DataProvider>(context).load(token);
                         },
                 ),
               ),
               IconButton(
                 icon: Icon(Icons.history),
-                onPressed: (_loading)
+                onPressed: (dataProvider.loading)
                     ? null
                     : () {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (builder) => FeedbackPage(
-                                activities: activities
+                                activities: dataProvider.activities
                                     .where((element) =>
                                         element.participants.contains(user) &&
                                         element.time.isBefore(DateTime.now()))
                                     .toList(),
-                                feedback: feedback)));
+                                feedback: dataProvider.feedbacks)));
                       },
               )
             ],
@@ -339,7 +282,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
               MaterialPageRoute(builder: (builder) => CreateActivityWidget()));
 
           if (created != null && created is bool && created == true) {
-            load();
+            await Provider.of<DataProvider>(context).load(token);
           }
         },
         child: Icon(Icons.add),

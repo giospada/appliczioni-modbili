@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:latlong2/latlong.dart';
 
 class Activity {
@@ -29,16 +31,28 @@ class Activity {
         json['position']['lat'],
         json['position']['long'],
       ),
-      attributes: Attributes(
-        level: json['attributes']['level'],
-        price: json['attributes']['price'],
-        sport: json['attributes']['sport'],
-      ),
+      attributes: Attributes.fromJson(json['attributes']),
       numberOfPeople: json['numberOfPeople'],
       id: json['id'],
       participants: List<String>.from(json['participants']),
       creator: json['creator'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'description': description,
+      'time': time.toIso8601String(),
+      'position': {
+        'lat': position.latitude,
+        'long': position.longitude,
+      },
+      'attributes': attributes.toJson(),
+      'numberOfPeople': numberOfPeople,
+      'id': id,
+      'participants': participants,
+      'creator': creator,
+    };
   }
 }
 
@@ -52,4 +66,20 @@ class Attributes {
     required this.price,
     required this.sport,
   });
+
+  factory Attributes.fromJson(Map<String, dynamic> json) {
+    return Attributes(
+      level: json['level'],
+      price: json['price'],
+      sport: json['sport'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'level': level,
+      'price': price,
+      'sport': sport,
+    };
+  }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:sport_mates/config/data_provider.dart';
 import 'package:sport_mates/config/theme.dart';
 import 'package:sport_mates/pages/search/Search.dart';
 import 'package:provider/provider.dart';
@@ -9,8 +10,11 @@ import 'package:sport_mates/pages/login/login_signup.dart';
 class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AuthProvider()..tryAutoLogin(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (ctx) => AuthProvider()),
+        ChangeNotifierProvider(create: (ctx) => DataProvider()),
+      ],
       child: MaterialApp(
         localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
