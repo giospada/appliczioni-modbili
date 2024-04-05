@@ -71,7 +71,7 @@ def create_activity(activity: schemas.ActivityCreate, db: Session = Depends(get_
 
 @app.get("/activities_delete", response_model=List[schemas.Activity])
 def get_deleted_activities(db: Session = Depends(get_db), date: Optional[datetime] = None):
-    return crud.get_deleted_activities(db)
+    return crud.get_deleted_activities(db,date)
 
 
 @app.get("/activities/search", response_model=List[int])
