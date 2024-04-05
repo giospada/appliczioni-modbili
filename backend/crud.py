@@ -120,13 +120,16 @@ def km_distance(long1: float, lat1: float, long2: float, lat2: float):
 def search_activities(db: Session, date:Optional[datetime]):
     db_activities = db.query(models.Activity)
     if date:
-        db_activities= db_activities.filter(models.Activity.time >= date).all()
-    return db_activities
+        db_activities= db_activities.filter(models.Activity.last_update > date)
+        
+    activities= db_activities.all()
+
+    return activities;
 
 def get_deleted_activities(db: Session, date:Optional[datetime])->list[int]:
     db_activities = db.query(models.DeletedActivity)
     if date:
-        db_activities= db_activities.filter(models.Activity.last_update >= date)
+        db_activities= db_activities.filter(models.Activity.last_update > date)
     return [dele.activity_id for dele in db_activities.all()]
 
 def get_activity_feedback(db: Session, username: str):
