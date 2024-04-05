@@ -7,8 +7,8 @@ from datetime import datetime, timedelta
 fake = Faker()
 
 # API Base URL
-BASE_URL = "http://localhost:8000"
-#"https://appliczioni-modbili.vercel.app"  
+BASE_URL = "https://appliczioni-modbili.vercel.app"  
+#"http://localhost:8000"
 
 
 NUMBER_OF_USER = 4
