@@ -12,8 +12,8 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (ctx) => AuthProvider()),
-        ChangeNotifierProvider(create: (ctx) => DataProvider()),
+        ChangeNotifierProvider(create: (ctx) => AuthProvider()..tryAutoLogin()),
+        ChangeNotifierProvider(create: (ctx) => DataProvider())
       ],
       child: MaterialApp(
         localizationsDelegates: [
@@ -27,8 +27,8 @@ class Home extends StatelessWidget {
         ],
         theme: createLightTheme(),
         darkTheme: createDarkTheme(),
-        home: Consumer<AuthProvider>(
-          builder: (ctx, auth, _) => auth.loading
+        home: Consumer<AuthProvider>(builder: (ctx, auth, _) {
+          return auth.loading
               ? const Scaffold(
                   body: Center(
                     child: CircularProgressIndicator(),
@@ -36,8 +36,8 @@ class Home extends StatelessWidget {
                 )
               : auth.isAuthenticated
                   ? SearchPage()
-                  : LoginSignupPage(),
-        ),
+                  : LoginSignupPage();
+        }),
       ),
     );
   }

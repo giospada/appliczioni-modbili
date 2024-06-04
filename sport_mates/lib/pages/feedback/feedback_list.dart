@@ -19,29 +19,33 @@ class FeedbackCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        leading: Icon(sportToIcon[activityData.attributes.sport]),
-        title: Text(displayFormattedDate(activityData.time)),
-        subtitle: feedbackData != null
-            ? Column(
-                children: [
-                  Text(feedbackData!.comment),
-                  StarRatingWidget(rating: feedbackData!.rating.toDouble())
-                ],
-              )
-            : ElevatedButton(
-                child: Text('Add Feedback'),
-                onPressed: () {
-                  // Navigate to a new screen to add feedback
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          AddFeedbackScreen(activity: activityData),
-                    ),
-                  );
-                },
-              ),
-      ),
+          leading: Icon(sportToIcon[activityData.attributes.sport]),
+          title: Text(displayFormattedDate(activityData.time)),
+          trailing: feedbackData != null
+              ? null
+              : IconButton(
+                  onPressed: () {
+                    // Navigate to a new screen to add feedback
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            AddFeedbackScreen(activity: activityData),
+                      ),
+                    );
+                  },
+                  icon: Icon(Icons.add)),
+          subtitle: feedbackData != null
+              ? Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Text(feedbackData!.comment),
+                      StarRatingWidget(rating: feedbackData!.rating.toDouble())
+                    ],
+                  ),
+                )
+              : null),
     );
   }
 }

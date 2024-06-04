@@ -10,5 +10,7 @@
 - [X] crea la visualizzazione da mappa https://docs.fleaflet.dev/usage/basics
 - [X] implementare i filtri
 - [X] feedback attività
-- [ ] notifiche push https://pub.dev/packages/flutter_local_notifications segui i step di installazione
-
+- [-] notifiche push https://pub.dev/packages/flutter_local_notifications segui i step di installazione
+- [-] controllare se leave etc are working
+- [-] implementare la roba sulle feedback
+- [X] better state manager with position

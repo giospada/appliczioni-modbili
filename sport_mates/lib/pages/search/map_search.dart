@@ -47,6 +47,7 @@ class _MapSearchState extends State<MapSearch> {
     this.activities = [...widget.activities];
     this.pos = widget.pos;
     this.radius = widget.radius;
+    mapController.move(pos, 13);
     setState(() {});
   }
 
@@ -61,7 +62,7 @@ class _MapSearchState extends State<MapSearch> {
 
     return Stack(
       children: [
-        Expanded(
+        Positioned.fill(
           child: FlutterMap(
               mapController: mapController,
               options: MapOptions(

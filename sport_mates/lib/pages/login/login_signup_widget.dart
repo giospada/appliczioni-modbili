@@ -26,7 +26,7 @@ class _LoginSignUpWidgetState extends State<LoginSignUpWidget> {
   String _email = '', _password = '';
   bool loading = false;
 
-  Future<void> _submit(BuildContext context) async {
+  Future<void> _submit() async {
     final isValid = _formKey.currentState?.validate();
     Config config = Config();
     if (!isValid!) return;
@@ -147,7 +147,7 @@ class _LoginSignUpWidgetState extends State<LoginSignUpWidget> {
                     (loading)
                         ? CircularProgressIndicator()
                         : ElevatedButton(
-                            onPressed: () => _submit(context),
+                            onPressed: () => _submit(),
                             child: Text(action == ActionStateLogin.login
                                 ? 'Login'
                                 : 'Signup'),

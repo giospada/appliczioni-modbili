@@ -51,6 +51,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   json_serializable: ^6.7.1
+  draggable_bottom_sheet: ^1.0.2
 
 dev_dependencies:
   flutter_test:

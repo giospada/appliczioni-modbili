@@ -5,6 +5,7 @@ import 'package:sport_mates/config/config.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/main.dart';
+import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 List<Activity> historyActivity(
@@ -81,29 +82,48 @@ Future<LatLng> determinePosition() async {
   return LatLng(pos.latitude, pos.longitude);
 }
 
-Future<void> scheduleNotification(DateTime scheduledDate) async {
+Future<void> scheduleNotification(
+    DateTime scheduledDate, int id, String title, String body) async {
   Config config = Config();
+
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+  flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+      ?.requestExactAlarmsPermission();
 
   if (config.notifyBefore == null) {
     return;
   }
   var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-    'your channel id',
-    'your channel name',
+    'sportmates',
+    'Sport mates notifications',
     importance: Importance.max,
     priority: Priority.high,
   );
   var platformChannelSpecifics =
       NotificationDetails(android: androidPlatformChannelSpecifics);
 
+  tz.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Europe/Rome'));
   await flutterLocalNotificationsPlugin.zonedSchedule(
-      0,
-      'Scheduled Notification Title',
-      'Scheduled Notification Body',
-      tz.TZDateTime.from(scheduledDate, tz.local),
+      id,
+      title,
+      body,
+      tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
       platformChannelSpecifics,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime);
+  List<ActiveNotification> pendingNotificationRequests =
+      await flutterLocalNotificationsPlugin.getActiveNotifications();
+
+  print('Pending notifications');
+  for (var notification in pendingNotificationRequests) {
+    print(
+        'Notification ID: ${notification.id}, Title: ${notification.title}, Body: ${notification.body}, Payload: ${notification.payload}');
+  }
 }
 
 bool isInRatio(LatLng p1, LatLng p2, double radio) {

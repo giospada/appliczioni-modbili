@@ -37,7 +37,7 @@ class FilterData {
     if (activity.numberOfPeople - activity.participants.length <= 0)
       return false;
     if (price && activity.attributes.price > maxPrice) return false;
-    if (isInRatio(activity.position, pos!, radius)) return false;
+    if (pos != null && isInRatio(activity.position, pos, radius)) return false;
     if (selectedSport != Config().nullSport &&
         activity.attributes.sport != selectedSport) return false;
     if (DateTime.now().isAfter(activity.time)) return false;

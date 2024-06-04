@@ -13,15 +13,10 @@ class Root extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'Flutter Demo',
-        theme: createLightTheme(),
-        darkTheme: createDarkTheme(),
-        home: SplashScreen(),
-        routes: {
-          '/login': (context) => LoginSignupPage(),
-          '/home': (context) => Home(),
-          '/settings': (context) => SettingsPage(),
-          '/create': (context) => CreateActivityWidget(),
-        });
+      title: 'Sport Mates',
+      theme: createLightTheme(),
+      darkTheme: createDarkTheme(),
+      home: SplashScreen(),
+    );
   }
 }

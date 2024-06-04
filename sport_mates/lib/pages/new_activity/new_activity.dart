@@ -1,18 +1,17 @@
 import 'package:latlong2/latlong.dart';
+import 'package:sport_mates/data/activity.dart';
 import 'package:sport_mates/pages/new_activity/pos_selector.dart';
 import 'package:sport_mates/pages/new_activity/layout_widget.dart';
-import 'package:sport_mates/pages/search/map_search.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sport_mates/config/auth_provider.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:sport_mates/pages/general_purpuse/loader.dart';
-import 'package:sport_mates/pages/new_activity/new_activity.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:sport_mates/config/data_provider.dart';
 import 'package:provider/provider.dart';
 
 class CreateActivityWidget extends StatefulWidget {
@@ -40,7 +39,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
   double long = 0, lati = 0;
   String? address;
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate() async {
     final DateTime? pickedDate = await showDatePicker(
         context: context,
         initialDate: DateTime.now(),
@@ -69,21 +68,21 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
   bool _validatePage() {
     if (_currentPage == 0) {
       if (lati == 0 || long == 0) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Please pick a location')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Please pick a location')));
         return true;
       }
     } else if (_currentPage == 1) {
       if (selectedDate == null) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Please pick a date')));
+            .showSnackBar(const SnackBar(content: Text('Please pick a date')));
         return true;
       }
     } else if (_currentPage == 2) {
       bool allFilled = !descriptionController.text.isEmpty;
       if (!allFilled) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Please enter a description')));
+            const SnackBar(content: Text('Please enter a description')));
         return true;
       }
     }
@@ -93,13 +92,14 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
   void requestActivity() async {
     if (_currentPage == _pageNumber) {
       final data = await Navigator.of(context).push(MaterialPageRoute(
-          builder: (context) => AsyncLoaderPage(
-              asyncOperation: () async => await _request(context))));
+          builder: (context) =>
+              AsyncLoaderPage(asyncOperation: () async => await _request())));
 
-      if (data is http.Response) {
+      if (data is http.Response && data.statusCode == 200) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Activity created')));
-        Navigator.pop(context);
+            .showSnackBar(const SnackBar(content: Text('Activity created')));
+        Activity activity = Activity.fromJson(jsonDecode(data.body));
+        Navigator.pop(context, activity);
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Failed to create activity')));
@@ -127,7 +127,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
     }
   }
 
-  Future<http.Response> _request(BuildContext context) async {
+  Future<http.Response> _request() async {
     Config config = Config();
     final token = Provider.of<AuthProvider>(context).token;
     final response = await http.post(
@@ -199,7 +199,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                 child: Column(
                   children: [
                     ElevatedButton(
-                      onPressed: () => _selectDate(context),
+                      onPressed: () => _selectDate(),
                       child: Text('Select Date'),
                     ),
                     Padding(

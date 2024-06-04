@@ -15,8 +15,6 @@ class UpcoingActivity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //get user from provider
-    final user = Provider.of<AuthProvider>(context).getUsername!;
     return Scaffold(
         appBar: AppBar(
           title: Text('Upcoming Activity'),

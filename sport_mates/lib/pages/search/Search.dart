@@ -5,7 +5,6 @@ import 'package:sport_mates/config/data_provider.dart';
 import 'package:sport_mates/pages/feedback/history.dart';
 import 'package:sport_mates/pages/general_purpuse/activity_card.dart';
 import 'package:sport_mates/pages/search/choose_position.dart';
-import 'package:sport_mates/pages/search/filter_chips.dart';
 import 'package:sport_mates/pages/search/filter_data.dart';
 import 'package:sport_mates/pages/search/filter_dialog.dart';
 import 'package:sport_mates/pages/search/map_search.dart';
@@ -14,36 +13,49 @@ import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:sport_mates/data/activity.dart';
-import 'package:sport_mates/data/feedback.dart';
-import 'package:sport_mates/config/config.dart';
 import 'package:sport_mates/pages/new_activity/new_activity.dart';
 import 'package:sport_mates/pages/settings/settings.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
-class SearchPage extends StatelessWidget {
+class SearchPage extends StatefulWidget {
+  @override
+  State<SearchPage> createState() => _SearchPageState();
+}
+
+class _SearchPageState extends State<SearchPage> {
+  String? token;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      token = authProvider.token;
+      if (token != null) {
+        Provider.of<DataProvider>(context, listen: false).load(token!);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final dataprovider = Provider.of<DataProvider>(context);
-    dataprovider.isFirstLoad = true;
     return Consumer<DataProvider>(builder: (context, dataProvider, child) {
-      return _SearchPage(dataProvider);
+      return _SearchPage(
+          key: UniqueKey(), data: dataProvider.toApplicationData());
     });
   }
 }
 
 class _SearchPage extends StatefulWidget {
-  DataProvider dataProvider;
+  final ApplicationData data;
 
-  _SearchPage(this.dataProvider);
+  _SearchPage({super.key, required this.data});
 
   @override
-  State<_SearchPage> createState() => _SearchPageState(dataProvider);
+  State<_SearchPage> createState() => _SearchPageStateFilter(data);
 }
 
-class _SearchPageState extends State<_SearchPage>
+class _SearchPageStateFilter extends State<_SearchPage>
     with TickerProviderStateMixin {
   LatLng? pos;
   double radius = 5000;
@@ -52,11 +64,11 @@ class _SearchPageState extends State<_SearchPage>
 
   late TabController _tabController;
   FilterData filterData = FilterData.init();
-  DataProvider dataProvider;
+  ApplicationData activityData;
 
-  _SearchPageState(this.dataProvider);
+  _SearchPageStateFilter(this.activityData);
 
-  Future<void> displayFilters(BuildContext context) async {
+  Future<void> displayFilters() async {
     var data = await showModalBottomSheet(
       context: context,
       builder: (context) => DialogFilter(filterData: filterData),
@@ -71,38 +83,35 @@ class _SearchPageState extends State<_SearchPage>
   void filterState(FilterData data) {
     setState(() {
       filterData = data;
-      displayActivities = filter(filterData, dataProvider.activities);
+      displayActivities = filter(filterData, activityData.activities);
     });
   }
 
   Future<void> choosePositionRadius() async {
     var chosenRadius = await Navigator.of(context).push(MaterialPageRoute(
         builder: (builder) =>
-            RadiusSelectorWidget(pos!, radius, dataProvider.activities)));
+            RadiusSelectorWidget(pos!, radius, activityData.activities)));
 
     radius = chosenRadius.elementAt(0);
     pos = chosenRadius.elementAt(1);
-
+    if (pos != null) {
+      Provider.of<DataProvider>(context, listen: false).lastPos = pos!;
+    }
     filterState(filterData);
   }
 
   List<Activity> filter(FilterData newFilterData, List<Activity> activities) {
-    return displayActivities = activities.where((element) {
+    return activities.where((element) {
       return newFilterData.isValidActivity(element, pos, radius);
     }).toList();
-  }
-
-  Future<void> start() async {
-    pos = await determinePosition();
-    filterState(filterData);
   }
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    dataProvider.loading = true;
-    start();
+    displayActivities = filter(filterData, activityData.activities);
+    pos = activityData.lastPos;
   }
 
   @override
@@ -113,15 +122,10 @@ class _SearchPageState extends State<_SearchPage>
 
   @override
   Widget build(BuildContext context) {
-    var authProvider = Provider.of<AuthProvider>(context);
+    var authProvider = Provider.of<AuthProvider>(context, listen: false);
     final user = authProvider.getUsername!;
     token = authProvider.token!;
-
-    if (dataProvider.isFirstLoad) {
-      dataProvider.load(token);
-    }
-
-    var upcoming = upcomingFilter(user, dataProvider.activities, pos);
+    var upcoming = upcomingFilter(user, activityData.activities, pos);
 
     return Scaffold(
       body: SafeArea(
@@ -134,18 +138,22 @@ class _SearchPageState extends State<_SearchPage>
                 suggestionsBuilder: (context, controller) {
                   return [
                         ListTile(
-                            title: Text('Set Position and Radius'),
-                            leading: Icon(Icons.location_on),
-                            onTap: choosePositionRadius),
+                            title: const Text('Set Position and Radius'),
+                            leading: const Icon(Icons.location_on),
+                            onTap: (activityData.loading)
+                                ? null
+                                : choosePositionRadius),
                         ListTile(
-                          title: Text('Set Filters'),
-                          leading: Icon(Icons.tune),
-                          onTap: () async {
-                            await displayFilters(context);
-                            controller.closeView(controller.text ?? "");
-                          },
+                          title: const Text('Set Filters'),
+                          leading: const Icon(Icons.tune),
+                          onTap: (activityData.loading)
+                              ? null
+                              : () async {
+                                  await displayFilters();
+                                  controller.closeView(controller.text ?? "");
+                                },
                         ),
-                        Divider(),
+                        const Divider(),
                       ] +
                       displayActivities
                           .where((element) =>
@@ -169,14 +177,17 @@ class _SearchPageState extends State<_SearchPage>
                       child: Badge(
                         isLabelVisible: filterData.hasFilter(),
                         child: IconButton(
-                          onPressed: () => displayFilters(context),
+                          onPressed: (activityData.loading)
+                              ? null
+                              : () => displayFilters(),
                           icon: const Icon(Icons.tune),
                         ),
                       )),
                   Tooltip(
                     message: 'Set Position and Radius',
                     child: IconButton(
-                      onPressed: choosePositionRadius,
+                      onPressed:
+                          (activityData.loading) ? null : choosePositionRadius,
                       icon: const Icon(Icons.location_on),
                     ),
                   )
@@ -184,7 +195,7 @@ class _SearchPageState extends State<_SearchPage>
               ),
               TabBar(
                 controller: _tabController,
-                tabs: [
+                tabs: const [
                   Tab(
                     icon: Icon(Icons.list),
                   ),
@@ -193,34 +204,50 @@ class _SearchPageState extends State<_SearchPage>
                   ),
                 ],
               ),
+              if (activityData.loading)
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          if (activityData.isConnected)
+                            Text('last update ${activityData.lastUpdate}')
+                          else if (activityData.isConnected)
+                            Text(
+                                'Not connected, last update ${activityData.lastUpdate}'),
+                        ],
+                      ),
+                      const Divider(),
+                    ],
+                  ),
+                ),
               Expanded(
                 child: TabBarView(controller: _tabController, children: [
-                  (dataProvider.loading || pos == null)
-                      ? Center(child: CircularProgressIndicator())
-                      : (displayActivities.length == 0)
-                          ? Center(
+                  (activityData.loading || pos == null)
+                      ? const Center(child: CircularProgressIndicator())
+                      : (displayActivities.isEmpty)
+                          ? const Center(
                               child: Text(
                                   'No activities founds, try to change the filters or the position'))
                           : RefreshIndicator(
                               onRefresh: () async {
-                                Provider.of<DataProvider>(context).load(token);
+                                Provider.of<DataProvider>(context,
+                                        listen: false)
+                                    .load(token);
                               },
                               child: ListView.builder(
                                 shrinkWrap: true,
                                 itemCount: displayActivities.length,
                                 itemBuilder: (context, index) {
                                   return ActivityCardWidget(
-                                      onReturn: () {
-                                        Provider.of<DataProvider>(context)
-                                            .load(token);
-                                      },
                                       activityData: displayActivities[index],
                                       pos: pos!);
                                 },
                               ),
                             ),
-                  (dataProvider.loading || pos == null)
-                      ? Center(child: CircularProgressIndicator())
+                  (activityData.loading || pos == null)
+                      ? const Center(child: CircularProgressIndicator())
                       : MapSearch(
                           pos: pos!,
                           activities: displayActivities,
@@ -237,7 +264,7 @@ class _SearchPageState extends State<_SearchPage>
           child: Row(
             children: <Widget>[
               IconButton(
-                icon: Icon(Icons.settings),
+                icon: const Icon(Icons.settings),
                 onPressed: () {
                   Navigator.of(context).push(
                       MaterialPageRoute(builder: (builder) => SettingsPage()));
@@ -246,30 +273,23 @@ class _SearchPageState extends State<_SearchPage>
               Badge(
                 isLabelVisible: upcoming.isNotEmpty,
                 child: IconButton(
-                  icon: Icon(Icons.upcoming),
-                  onPressed: (dataProvider.loading)
+                  icon: const Icon(Icons.upcoming),
+                  onPressed: (activityData.loading)
                       ? null
                       : () async {
                           await Navigator.of(context).push(MaterialPageRoute(
                               builder: (builder) => UpcoingActivity(
                                   activities: upcoming, pos: pos!)));
-                          await Provider.of<DataProvider>(context).load(token);
                         },
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.history),
-                onPressed: (dataProvider.loading)
+                icon: const Icon(Icons.history),
+                onPressed: (activityData.loading)
                     ? null
                     : () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (builder) => FeedbackPage(
-                                activities: dataProvider.activities
-                                    .where((element) =>
-                                        element.participants.contains(user) &&
-                                        element.time.isBefore(DateTime.now()))
-                                    .toList(),
-                                feedback: dataProvider.feedbacks)));
+                            builder: (builder) => FeedbackPage()));
                       },
               )
             ],
@@ -278,14 +298,15 @@ class _SearchPageState extends State<_SearchPage>
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          var created = Navigator.of(context).push(
-              MaterialPageRoute(builder: (builder) => CreateActivityWidget()));
-
-          if (created != null && created is bool && created == true) {
-            await Provider.of<DataProvider>(context).load(token);
+          var activity = await Navigator.of(context).push(MaterialPageRoute(
+              builder: (builder) => CreateActivityWidget())) as Activity?;
+          if (activity != null && context.mounted) {
+            Provider.of<DataProvider>(context, listen: false)
+                .addActivity(activity);
+            filterState(filterData);
           }
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endContained,
     );

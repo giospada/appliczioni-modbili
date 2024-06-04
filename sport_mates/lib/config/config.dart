@@ -18,7 +18,7 @@ class Config {
 
   final String? defToken = !kDebugMode
       ? null
-      : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHJpbmciLCJleHAiOjE3MTkzOTc4MTF9.pCulGDc_PpfYbEmkVO_JEt-24C5P_MlgSl-iK3aDDzw";
+      : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHJpbmciLCJleHAiOjE3MjYxMzEwMDR9.UEUjNYSLVXXud46ujGKpkWrLcewtn5cUofpRvLkaUOs";
 
   final List<String> sports = ['running', 'basketball', 'football'];
 }

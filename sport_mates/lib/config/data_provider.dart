@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
@@ -13,12 +14,19 @@ class DataProvider with ChangeNotifier {
   List<Activity> activities = [];
   List<FeedbackActivity> feedbacks = [];
   DateTime? lastUpdate = null;
-  bool isFirstLoad = true;
+  LatLng lastPos = LatLng(44.498955, 11.327591);
+  bool loadingPos = false;
+
+  void addActivity(Activity activity) {
+    activities.add(activity);
+    notifyListeners();
+  }
 
   Future<void> loadFromStorage() async {
     final String? activitiesString = await storage.read(key: 'activities');
     final String? feedbacksString = await storage.read(key: 'feedbacks');
     final String? lastUpdateString = await storage.read(key: 'lastUpdate');
+    final String? lastPosString = await storage.read(key: 'lastPos');
     if (activitiesString != null) {
       activities = (json.decode(activitiesString) as List)
           .map((e) => Activity.fromJson(e))
@@ -32,22 +40,16 @@ class DataProvider with ChangeNotifier {
     if (lastUpdateString != null) {
       lastUpdate = DateTime.parse(lastUpdateString);
     }
-    loading = false;
-    notifyListeners();
+    if (lastPosString != null) {
+      lastPos = LatLng.fromJson(json.decode(lastPosString));
+    }
   }
 
-  Future<void> finishLoad() async {
-    loading = true;
-    notifyListeners();
-  }
-
-  Future<void> saveToStorage() async {
+  Future<void> saveToStorage(DateTime lastUpdate) async {
     await storage.write(key: 'activities', value: json.encode(activities));
     await storage.write(key: 'feedbacks', value: json.encode(feedbacks));
-    await storage.write(
-        key: 'lastUpdate', value: DateTime.now().toIso8601String());
-    loading = true;
-    notifyListeners();
+    await storage.write(key: 'lastUpdate', value: lastUpdate.toIso8601String());
+    await storage.write(key: 'lastPos', value: json.encode(lastPos));
   }
 
   Future<List<FeedbackActivity>> loadFeedback(token) async {
@@ -62,12 +64,7 @@ class DataProvider with ChangeNotifier {
   }
 
   int _findActivityIndex(int id) {
-    for (var i = 0; i < activities.length; i++) {
-      if (activities[i].id == id) {
-        return i;
-      }
-    }
-    return -1;
+    return activities.indexWhere((element) => element.id == id);
   }
 
   void update_activity(
@@ -84,6 +81,8 @@ class DataProvider with ChangeNotifier {
       var index = _findActivityIndex(deletedActivities[i]);
       if (index != -1) {
         activities.removeAt(index);
+        feedbacks.removeWhere(
+            (element) => element.activityId == deletedActivities[i]);
       }
     }
   }
@@ -91,7 +90,10 @@ class DataProvider with ChangeNotifier {
   Future<void> load(token) async {
     loading = true;
     notifyListeners();
+    await loadFromStorage();
     try {
+      var lastUpdate = DateTime.now();
+      lastUpdate = lastUpdate.subtract(lastUpdate.timeZoneOffset);
       var ids = await _loadIds();
       var feedback = await loadFeedback(token);
       var updated_activities = await _loadAllActivitys(ids.cast<int>());
@@ -99,10 +101,9 @@ class DataProvider with ChangeNotifier {
       update_activity(updated_activities, deleted_activities);
       this.feedbacks = feedback;
       this.lastUpdate = DateTime.now();
-      await saveToStorage();
+      await saveToStorage(lastUpdate);
       loading = false;
       isConnected = true;
-      isFirstLoad = false;
       notifyListeners();
     } catch (e) {
       loading = false;
@@ -142,4 +143,45 @@ class DataProvider with ChangeNotifier {
     }
     return json.decode(req.body).cast<int>();
   }
+
+  ApplicationData toApplicationData() {
+    return ApplicationData(this.loading, this.isConnected, this.activities,
+        this.feedbacks, this.lastUpdate, this.lastPos);
+  }
+
+  void joinActivity(int id, String user) {
+    var index = _findActivityIndex(id);
+    if (index != -1) {
+      activities[index].participants.add(user);
+      notifyListeners();
+    }
+  }
+
+  void leaveActivity(int id, String user) {
+    var index = _findActivityIndex(id);
+    if (index != -1) {
+      activities[index].participants.remove(user);
+      notifyListeners();
+    }
+  }
+
+  void deleteActivity(int id) {
+    var index = _findActivityIndex(id);
+    if (index != -1) {
+      activities.removeAt(index);
+      notifyListeners();
+    }
+  }
+}
+
+class ApplicationData {
+  bool loading = false;
+  bool isConnected = false;
+  List<Activity> activities = [];
+  List<FeedbackActivity> feedbacks = [];
+  DateTime? lastUpdate = null;
+  LatLng lastPos;
+
+  ApplicationData(this.loading, this.isConnected, this.activities,
+      this.feedbacks, this.lastUpdate, this.lastPos);
 }

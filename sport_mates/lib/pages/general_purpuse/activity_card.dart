@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/data/activity.dart';
-import 'package:sport_mates/pages/general_purpuse/activity_details.dart';
+import 'package:sport_mates/pages/general_purpuse/activity_page.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -24,7 +24,7 @@ class ActivityCardWidget extends StatelessWidget {
         await Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ActivityDetailsWidget(
+                builder: (context) => ActivityDetailsPage(
                     activityData: activityData, position: pos!)));
         if (onReturn != null) {
           onReturn!();
