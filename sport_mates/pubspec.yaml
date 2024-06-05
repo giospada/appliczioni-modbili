@@ -1,7 +1,5 @@
 name: sport_mates
-description: "A new Flutter project."
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
+description: "Project for the curse of Mobile Applications Development at the University of Bologna."
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
@@ -47,11 +45,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.6
   async: ^2.11.0
-  intl: any
   flutter_localizations:
     sdk: flutter
   json_serializable: ^6.7.1
   draggable_bottom_sheet: ^1.0.2
+  timezone: ^0.9.3
 
 dev_dependencies:
   flutter_test:

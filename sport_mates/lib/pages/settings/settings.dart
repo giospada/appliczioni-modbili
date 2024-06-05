@@ -2,14 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:sport_mates/config/auth_provider.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:provider/provider.dart';
+import 'package:sport_mates/config/data_provider.dart';
 
 class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final username = Provider.of<AuthProvider>(context).getUsername ?? '';
+    var notifyBefore = Config().notifyBefore;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: const Text('Impostazioni'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -24,7 +26,7 @@ class SettingsPage extends StatelessWidget {
                     width: double.infinity,
                     height: 120,
                     clipBehavior: Clip.antiAlias,
-                    decoration: BoxDecoration(shape: BoxShape.circle),
+                    decoration: const BoxDecoration(shape: BoxShape.circle),
                     child: FadeInImage.assetNetwork(
                         placeholder: 'assets/images/avatar.png',
                         image:
@@ -33,34 +35,43 @@ class SettingsPage extends StatelessWidget {
             ),
             Text(
               username,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             //Create a dropdown menu to select how much before the event the user wants to be notified
-            Divider(),
+            const Divider(),
             ListTile(
-              title: Text('Notify me before the event'),
-              trailing: DropdownButton<int>(
-                value: Config().notifyBefore,
-                items: [5, 10, 15, 20, 30, 60, null]
-                    .map<DropdownMenuItem<int>>((e) => DropdownMenuItem<int>(
-                          value: e,
-                          child: Text(e != null ? '$e minutes' : 'Never'),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  Config().notifyBefore = value;
-                },
-              ),
-            ),
+                title: const Text('Notifica prima dell\'evento'),
+                trailing: StatefulBuilder(
+                  builder: (context, setState) {
+                    return DropdownButton<int>(
+                      value: notifyBefore,
+                      items: [5, 10, 15, 20, 30, 60, null]
+                          .map<DropdownMenuItem<int>>((e) =>
+                              DropdownMenuItem<int>(
+                                value: e,
+                                child: Text(e != null ? '$e minuti' : 'mai'),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        Config().notifyBefore = value;
+                        setState(() {
+                          notifyBefore = value;
+                        });
+                      },
+                    );
+                  },
+                )),
             ListTile(
               leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
-              onTap: () {
+              title: const Text('Esci'),
+              onTap: () async {
                 Provider.of<AuthProvider>(context, listen: false).logout();
+                await Provider.of<DataProvider>(context, listen: false)
+                    .deleteAllStoredData();
                 Navigator.pop(context);
               },
             ),

@@ -6,8 +6,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/data/activity.dart';
 import 'package:sport_mates/utils.dart';
 
-final double ICON_SIZE = 20;
-final double ICON_PADDING = 10;
+const double ICON_SIZE = 20;
+const double ICON_PADDING = 10;
 
 class Clusters {
   List<Activity> activities = [];
@@ -56,8 +56,8 @@ List<Widget> createMarkers(
       Icons.circle,
       size: ICON_SIZE, //check if inside the radius
       color: isInRatio(activity.position, center, radius)
-          ? Colors.grey
-          : Colors.black54,
+          ? Colors.black54
+          : Colors.black87,
     );
     return Marker(
       width: ICON_SIZE + ICON_PADDING,
@@ -67,10 +67,8 @@ List<Widget> createMarkers(
         child: (onTap != null)
             ? IconButton(
                 onPressed: () => onTap(activity),
-                icon: Icon(
-                  Icons.circle,
-                  size: ICON_SIZE,
-                ),
+                icon:
+                    Icon(Icons.circle, size: ICON_SIZE, color: Colors.black54),
               )
             : icon,
       ),
@@ -106,7 +104,7 @@ List<Widget> createMarkers(
                                         .unproject(cluster.center),
                                     center,
                                     radius)
-                                ? Colors.grey
+                                ? Colors.black87
                                 : Colors.black54,
                             shape: BoxShape.circle,
                           ),

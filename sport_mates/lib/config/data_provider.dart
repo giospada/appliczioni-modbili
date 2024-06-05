@@ -22,6 +22,15 @@ class DataProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteAllStoredData() async {
+    await storage.deleteAll();
+    loading = false;
+    isConnected = false;
+    activities = [];
+    feedbacks = [];
+    lastUpdate = null;
+  }
+
   Future<void> loadFromStorage() async {
     final String? activitiesString = await storage.read(key: 'activities');
     final String? feedbacksString = await storage.read(key: 'feedbacks');
@@ -56,7 +65,7 @@ class DataProvider with ChangeNotifier {
     final req = await http.get(Uri.https(Config().host, '/feedback'),
         headers: {'Authorization': 'Bearer ${token}'});
     if (req.statusCode != 200) {
-      throw Exception('Failed to load feedback');
+      throw Exception('Impossibile caricare i feedback');
     }
     final feedback =
         json.decode(req.body).map((e) => FeedbackActivity.fromJson(e));
@@ -120,7 +129,7 @@ class DataProvider with ChangeNotifier {
     final req =
         await http.get(Uri.https(Config().host, '/activities/search', params));
     if (req.statusCode != 200) {
-      throw Exception('Failed to load ids');
+      throw Exception('Impossible caricare gli id attività');
     }
     return json.decode(req.body).cast<int>();
   }
@@ -139,14 +148,14 @@ class DataProvider with ChangeNotifier {
   Future<List<int>> _deletedActivities(token) async {
     final req = await http.get(Uri.https(Config().host, '/activities_delete'));
     if (req.statusCode != 200) {
-      throw Exception('Failed to load feedback');
+      throw Exception('Impossibile caricare le attività cancellate');
     }
     return json.decode(req.body).cast<int>();
   }
 
   ApplicationData toApplicationData() {
-    return ApplicationData(this.loading, this.isConnected, this.activities,
-        this.feedbacks, this.lastUpdate, this.lastPos);
+    return ApplicationData(
+        loading, isConnected, activities, feedbacks, lastUpdate, lastPos);
   }
 
   void joinActivity(int id, String user) {
@@ -155,6 +164,11 @@ class DataProvider with ChangeNotifier {
       activities[index].participants.add(user);
       notifyListeners();
     }
+  }
+
+  void addFeedback(FeedbackActivity feedback) {
+    feedbacks.add(feedback);
+    notifyListeners();
   }
 
   void leaveActivity(int id, String user) {

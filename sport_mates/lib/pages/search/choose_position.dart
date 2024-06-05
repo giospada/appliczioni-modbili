@@ -1,9 +1,7 @@
-import 'dart:math';
 import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/data/activity.dart';
 import 'package:sport_mates/pages/general_purpuse/map_markers.dart';
@@ -55,21 +53,21 @@ class _RadiusSelectorWidgetState extends State<RadiusSelectorWidget> {
                         onMapReady: () {
                           mapController.mapEventStream.listen((event) {
                             if (event is MapEventMove) {
-                              event = event as MapEventMove;
+                              event = event;
                               setState(() {
                                 center = LatLng(event.camera.center.latitude,
                                     event.camera.center.longitude);
                               });
                             }
                             if (event is MapEventScrollWheelZoom) {
-                              event = event as MapEventScrollWheelZoom;
+                              event = event;
                               setState(() {
                                 center = LatLng(event.camera.center.latitude,
                                     event.camera.center.longitude);
                               });
                             }
                             if (event is MapEventDoubleTapZoom) {
-                              event = event as MapEventDoubleTapZoom;
+                              event = event;
                               setState(() {
                                 center = LatLng(event.camera.center.latitude,
                                     event.camera.center.longitude);
@@ -101,9 +99,9 @@ class _RadiusSelectorWidgetState extends State<RadiusSelectorWidget> {
                   right: 10,
                   child: Container(
                     clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(color: Colors.white60),
+                    decoration: const BoxDecoration(color: Colors.white60),
                     child: IconButton(
-                      icon: Icon(Icons.my_location),
+                      icon: const Icon(Icons.my_location),
                       onPressed: () async {
                         LatLng pos = await determinePosition();
                         mapController.move(pos, mapController.camera.zoom);
@@ -121,7 +119,7 @@ class _RadiusSelectorWidgetState extends State<RadiusSelectorWidget> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Radius '),
+                    const Text('Raggio '),
                     Slider(
                       value: radius,
                       min: 500,
@@ -141,7 +139,7 @@ class _RadiusSelectorWidgetState extends State<RadiusSelectorWidget> {
                     onPressed: () {
                       Navigator.of(context).pop({radius, center});
                     },
-                    child: const Text('Choose')),
+                    child: const Text('Scegli questa posizione e raggio')),
               ],
             ),
           ),

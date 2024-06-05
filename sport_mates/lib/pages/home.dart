@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sport_mates/config/data_provider.dart';
 import 'package:sport_mates/config/theme.dart';
 import 'package:sport_mates/pages/search/Search.dart';
@@ -16,15 +15,6 @@ class Home extends StatelessWidget {
         ChangeNotifierProvider(create: (ctx) => DataProvider())
       ],
       child: MaterialApp(
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: [
-          Locale('en'),
-          Locale('it'),
-        ],
         theme: createLightTheme(),
         darkTheme: createDarkTheme(),
         home: Consumer<AuthProvider>(builder: (ctx, auth, _) {

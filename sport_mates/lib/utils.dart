@@ -1,7 +1,6 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sport_mates/data/activity.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_mates/config/config.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/main.dart';
@@ -41,7 +40,9 @@ Map<String, IconData> sportToIcon = {
 };
 
 String displayFormattedDate(DateTime date) {
-  return "il ${date.day}/${date.month} alle ${date.hour}:${date.minute}";
+  padding(int n) => n.toString().padLeft(2, '0');
+
+  return "il ${date.day}/${padding(date.month)} alle ${padding(date.hour)}:${padding(date.minute)}";
 }
 
 Future<LatLng> determinePosition() async {
@@ -84,8 +85,6 @@ Future<LatLng> determinePosition() async {
 
 Future<void> scheduleNotification(
     DateTime scheduledDate, int id, String title, String body) async {
-  Config config = Config();
-
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   flutterLocalNotificationsPlugin
@@ -93,10 +92,7 @@ Future<void> scheduleNotification(
           AndroidFlutterLocalNotificationsPlugin>()
       ?.requestExactAlarmsPermission();
 
-  if (config.notifyBefore == null) {
-    return;
-  }
-  var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
     'sportmates',
     'Sport mates notifications',
     importance: Importance.max,
@@ -107,23 +103,24 @@ Future<void> scheduleNotification(
 
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation('Europe/Rome'));
+
+  tz.TZDateTime time = tz.TZDateTime.from(scheduledDate, tz.local);
   await flutterLocalNotificationsPlugin.zonedSchedule(
-      id,
-      title,
-      body,
-      tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
-      platformChannelSpecifics,
+      id, title, body, time, platformChannelSpecifics,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       uiLocalNotificationDateInterpretation:
           UILocalNotificationDateInterpretation.absoluteTime);
+}
+
+Future<List<int>> getActiveNotification() async {
   List<ActiveNotification> pendingNotificationRequests =
       await flutterLocalNotificationsPlugin.getActiveNotifications();
+  List<int?> unfiltered = pendingNotificationRequests.map((e) => e.id).toList();
+  return unfiltered.where((element) => element != null).map((e) => e!).toList();
+}
 
-  print('Pending notifications');
-  for (var notification in pendingNotificationRequests) {
-    print(
-        'Notification ID: ${notification.id}, Title: ${notification.title}, Body: ${notification.body}, Payload: ${notification.payload}');
-  }
+Future<void> cancelNotification(int id) async {
+  await flutterLocalNotificationsPlugin.cancel(id);
 }
 
 bool isInRatio(LatLng p1, LatLng p2, double radio) {

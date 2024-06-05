@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:sport_mates/pages/login/action_state_login.dart';
 import 'package:sport_mates/pages/login/login_signup_widget.dart';
 
@@ -27,29 +26,33 @@ class _LoginSignupPageState extends State<LoginSignupPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(
-              text: 'Login',
-              icon: Icon(Icons.login),
-            ),
-            Tab(
-              text: 'Sign Up',
-              icon: Icon(Icons.person_add),
-            ),
-          ],
-        ),
-        body: SafeArea(
-          child: TabBarView(controller: _tabController, children: [
-            LoginSignUpWidget(
-              action: ActionStateLogin.login,
-            ),
-            LoginSignUpWidget(
-              action: ActionStateLogin.signUp,
-            ),
-          ]),
-        ));
+    return SafeArea(
+        child: Scaffold(
+      appBar: TabBar(
+        controller: _tabController,
+        tabs: const [
+          Tab(
+            text: 'Login',
+            icon: Icon(Icons.login),
+          ),
+          Tab(
+            text: 'Sign Up',
+            icon: Icon(Icons.person_add),
+          ),
+        ],
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: const [
+          LoginSignUpWidget(
+            action: ActionStateLogin.login,
+          ),
+          LoginSignUpWidget(
+            action: ActionStateLogin.signUp,
+          ),
+        ],
+      ),
+      resizeToAvoidBottomInset: false,
+    ));
   }
 }

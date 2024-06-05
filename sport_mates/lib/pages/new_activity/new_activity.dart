@@ -4,7 +4,6 @@ import 'package:sport_mates/pages/new_activity/pos_selector.dart';
 import 'package:sport_mates/pages/new_activity/layout_widget.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:sport_mates/config/auth_provider.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:sport_mates/pages/general_purpuse/loader.dart';
@@ -79,7 +78,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
         return true;
       }
     } else if (_currentPage == 2) {
-      bool allFilled = !descriptionController.text.isEmpty;
+      bool allFilled = descriptionController.text.isNotEmpty;
       if (!allFilled) {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Please enter a description')));
@@ -101,8 +100,8 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
         Activity activity = Activity.fromJson(jsonDecode(data.body));
         Navigator.pop(context, activity);
       } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Failed to create activity')));
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to create activity')));
       }
     }
   }
@@ -115,7 +114,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
     if (_pageController.page!.round() < _pageNumber) {
       _currentPage++;
       _pageController.nextPage(
-          duration: Duration(milliseconds: 300), curve: Curves.easeIn);
+          duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
     }
   }
 
@@ -123,7 +122,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
     if (_pageController.page!.round() > 0) {
       _currentPage--;
       _pageController.previousPage(
-          duration: Duration(milliseconds: 300), curve: Curves.easeIn);
+          duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
     }
   }
 
@@ -154,6 +153,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
 
     if (response.statusCode == 200) {
       // Handle successful submission
+      Provider.of<DataProvider>(context, listen: false).load(token);
       return response;
     } else {
       throw Exception('Failed to submit activity, ${response.body}');
@@ -167,8 +167,8 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
         body: PageView(
           controller: _pageController,
           physics: _isSwipeEnabled
-              ? AlwaysScrollableScrollPhysics()
-              : NeverScrollableScrollPhysics(),
+              ? const AlwaysScrollableScrollPhysics()
+              : const NeverScrollableScrollPhysics(),
           children: [
             LayoutWidget(
                 svgPath: 'assets/svg/best_place.svg',
@@ -189,7 +189,10 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                     }
                   },
                   child: Column(
-                    children: [Text('Pick Location'), Text(address ?? ' ')],
+                    children: [
+                      const Text('Pick Location'),
+                      Text(address ?? ' ')
+                    ],
                   ),
                 )),
             LayoutWidget(
@@ -200,7 +203,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                   children: [
                     ElevatedButton(
                       onPressed: () => _selectDate(),
-                      child: Text('Select Date'),
+                      child: const Text('Select Date'),
                     ),
                     Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -213,7 +216,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
               svgWidget: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
                 transitionBuilder: (Widget child, Animation<double> animation) {
-                  return ScaleTransition(child: child, scale: animation);
+                  return ScaleTransition(scale: animation, child: child);
                 },
                 child: SvgPicture.asset(
                   'assets/svg/${_selectedSport}.svg',
@@ -227,12 +230,12 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
               child: Column(
                 children: [
                   TextFormField(
-                    decoration: InputDecoration(labelText: 'Description'),
+                    decoration: const InputDecoration(labelText: 'Description'),
                     controller: descriptionController,
                   ),
                   DropdownButtonFormField<String>(
                     value: _selectedSport,
-                    decoration: InputDecoration(labelText: 'Sport'),
+                    decoration: const InputDecoration(labelText: 'Sport'),
                     items: List<String>.from(_allSports).map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
@@ -246,7 +249,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                     },
                   ),
                   SwitchListTile(
-                    title: Text('Is the activity free?'),
+                    title: const Text('Is the activity free?'),
                     value: _isFree,
                     onChanged: (bool value) {
                       setState(() {
@@ -256,10 +259,11 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                   ),
                   AnimatedContainer(
                     height: _isFree ? 0 : 60,
-                    duration: Duration(milliseconds: 200),
+                    duration: const Duration(milliseconds: 200),
                     child: !_isFree
                         ? TextFormField(
-                            decoration: InputDecoration(labelText: 'Price'),
+                            decoration:
+                                const InputDecoration(labelText: 'Price'),
                             keyboardType: TextInputType.number,
                             onChanged: (value) {
                               value = value == '' ? '0' : value;
@@ -270,7 +274,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                   ),
                   TextFormField(
                       decoration:
-                          InputDecoration(labelText: 'Number of People'),
+                          const InputDecoration(labelText: 'Number of People'),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         value = value == '' ? '0' : value;
@@ -286,18 +290,18 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
           children: [
             FloatingActionButton(
               onPressed: previusPageFunciton,
-              child: Icon(Icons.navigate_before),
               //make it little and gray
               backgroundColor: Theme.of(context).colorScheme.secondary,
               mini: true,
               heroTag: 'back',
+              child: const Icon(Icons.navigate_before),
             ),
             FloatingActionButton(
                 onPressed: nextPageFunction,
-                child: Icon(
+                heroTag: 'next',
+                child: const Icon(
                   Icons.navigate_next,
-                ),
-                heroTag: 'next'),
+                )),
           ],
         ));
   }

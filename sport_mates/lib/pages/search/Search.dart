@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/config/auth_provider.dart';
 import 'package:sport_mates/config/data_provider.dart';
@@ -11,7 +10,6 @@ import 'package:sport_mates/pages/search/map_search.dart';
 import 'package:sport_mates/pages/upcoming_activity/upcoming_activity.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:sport_mates/data/activity.dart';
 import 'package:sport_mates/pages/new_activity/new_activity.dart';
 import 'package:sport_mates/pages/settings/settings.dart';
@@ -88,9 +86,11 @@ class _SearchPageStateFilter extends State<_SearchPage>
   }
 
   Future<void> choosePositionRadius() async {
+    List<Activity> activities =
+        filter(FilterData.init(), activityData.activities);
+
     var chosenRadius = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (builder) =>
-            RadiusSelectorWidget(pos!, radius, activityData.activities)));
+        builder: (builder) => RadiusSelectorWidget(pos!, radius, activities)));
 
     radius = chosenRadius.elementAt(0);
     pos = chosenRadius.elementAt(1);
@@ -110,8 +110,8 @@ class _SearchPageStateFilter extends State<_SearchPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    displayActivities = filter(filterData, activityData.activities);
     pos = activityData.lastPos;
+    displayActivities = filter(filterData, activityData.activities);
   }
 
   @override
@@ -138,13 +138,13 @@ class _SearchPageStateFilter extends State<_SearchPage>
                 suggestionsBuilder: (context, controller) {
                   return [
                         ListTile(
-                            title: const Text('Set Position and Radius'),
+                            title: const Text('Imposta posizione e raggio'),
                             leading: const Icon(Icons.location_on),
                             onTap: (activityData.loading)
                                 ? null
                                 : choosePositionRadius),
                         ListTile(
-                          title: const Text('Set Filters'),
+                          title: const Text('Imposta i filtri'),
                           leading: const Icon(Icons.tune),
                           onTap: (activityData.loading)
                               ? null
@@ -173,7 +173,7 @@ class _SearchPageStateFilter extends State<_SearchPage>
                 barLeading: const Icon(Icons.search),
                 barTrailing: <Widget>[
                   Tooltip(
-                      message: 'Set Filters',
+                      message: 'Imposta i filtri',
                       child: Badge(
                         isLabelVisible: filterData.hasFilter(),
                         child: IconButton(
@@ -184,7 +184,7 @@ class _SearchPageStateFilter extends State<_SearchPage>
                         ),
                       )),
                   Tooltip(
-                    message: 'Set Position and Radius',
+                    message: 'Imposta la posizione e raggio',
                     child: IconButton(
                       onPressed:
                           (activityData.loading) ? null : choosePositionRadius,
@@ -212,10 +212,11 @@ class _SearchPageStateFilter extends State<_SearchPage>
                       Row(
                         children: [
                           if (activityData.isConnected)
-                            Text('last update ${activityData.lastUpdate}')
+                            Text(
+                                'ultimo aggiornamento ${activityData.lastUpdate}')
                           else if (activityData.isConnected)
                             Text(
-                                'Not connected, last update ${activityData.lastUpdate}'),
+                                'Non connesso, ultimo aggiornamento ${activityData.lastUpdate}'),
                         ],
                       ),
                       const Divider(),
@@ -229,7 +230,8 @@ class _SearchPageStateFilter extends State<_SearchPage>
                       : (displayActivities.isEmpty)
                           ? const Center(
                               child: Text(
-                                  'No activities founds, try to change the filters or the position'))
+                              'Nessuna attività trovata, prova a cambiare i filtri o la posizione',
+                            ))
                           : RefreshIndicator(
                               onRefresh: () async {
                                 Provider.of<DataProvider>(context,
@@ -279,7 +281,9 @@ class _SearchPageStateFilter extends State<_SearchPage>
                       : () async {
                           await Navigator.of(context).push(MaterialPageRoute(
                               builder: (builder) => UpcoingActivity(
-                                  activities: upcoming, pos: pos!)));
+                                  activities: upcomingFilter(
+                                      user, activityData.activities, pos),
+                                  pos: pos!)));
                         },
                 ),
               ),
@@ -289,7 +293,7 @@ class _SearchPageStateFilter extends State<_SearchPage>
                     ? null
                     : () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (builder) => FeedbackPage()));
+                            builder: (builder) => const FeedbackPage()));
                       },
               )
             ],

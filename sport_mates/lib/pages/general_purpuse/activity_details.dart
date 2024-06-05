@@ -1,19 +1,10 @@
-import 'dart:convert';
-
-import 'package:sport_mates/config/data_provider.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_mates/config/auth_provider.dart';
 import 'package:sport_mates/data/activity.dart';
-import 'package:sport_mates/config/config.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 
-import 'package:sport_mates/pages/general_purpuse/loader.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:maps_launcher/maps_launcher.dart';
-import 'package:provider/provider.dart';
 
 class ActivityDetailsWidget extends StatelessWidget {
   Activity activityData;
@@ -32,7 +23,7 @@ class ActivityDetailsWidget extends StatelessWidget {
         SingleChildScrollView(
           child: Column(
             children: <Widget>[
-              Container(
+              SizedBox(
                 height: 200,
                 child: Stack(
                   children: [
@@ -53,7 +44,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                               height: 80.0,
                               point: activityData.position,
                               child: IconButton(
-                                icon: Icon(
+                                icon: const Icon(
                                   Icons.location_on,
                                   color: Colors.red,
                                   size: 40,
@@ -90,13 +81,13 @@ class ActivityDetailsWidget extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.all(15),
+                padding: const EdgeInsets.all(15),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                      child: Container(
+                      child: SizedBox(
                         width: double.infinity,
                         child: Column(
                           children: [
@@ -125,8 +116,8 @@ class ActivityDetailsWidget extends StatelessWidget {
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.access_time),
-                                  SizedBox(width: 15),
+                                  const Icon(Icons.access_time),
+                                  const SizedBox(width: 15),
                                   Text(
                                     displayFormattedDate(activityData.time),
                                   ),
@@ -134,9 +125,9 @@ class ActivityDetailsWidget extends StatelessWidget {
                               ),
                               Row(
                                 children: [
-                                  Icon(Icons
+                                  const Icon(Icons
                                       .location_on), // Replace with your icon
-                                  SizedBox(width: 15),
+                                  const SizedBox(width: 15),
                                   Text(
                                     "${getMeterOrKmDistance(activityData.position, position)} distanza",
                                   ),
@@ -144,8 +135,9 @@ class ActivityDetailsWidget extends StatelessWidget {
                               ),
                               Row(
                                 children: [
-                                  Icon(Icons.people), // Replace with your icon
-                                  SizedBox(width: 15),
+                                  const Icon(
+                                      Icons.people), // Replace with your icon
+                                  const SizedBox(width: 15),
                                   Text(
                                     restanti.toString(),
                                     style: TextStyle(
@@ -169,13 +161,13 @@ class ActivityDetailsWidget extends StatelessWidget {
                               .end, // Align price to the end of the column
                           children: [
                             (activityData.attributes.price == 0)
-                                ? Text(
+                                ? const Text(
                                     "Gratis",
                                     style: TextStyle(color: Colors.green),
                                   )
                                 : Text(
                                     "${activityData.attributes.price}€",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                         fontSize: 20,
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -183,7 +175,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Divider(),
+                    const Divider(),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                       child: Column(
@@ -198,7 +190,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                     ListView.builder(
                       shrinkWrap: true,
                       physics:
-                          NeverScrollableScrollPhysics(), // Disables ListView's scrolling
+                          const NeverScrollableScrollPhysics(), // Disables ListView's scrolling
                       itemCount: activityData.participants.length,
                       itemBuilder: (context, index) {
                         var e = activityData.participants[index];
@@ -206,7 +198,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                           leading: FadeInImage.assetNetwork(
                             placeholder: 'assets/images/avatar.png',
                             image:
-                                'https://api.dicebear.com/7.x/lorelei/png?seed=${e}',
+                                'https://api.dicebear.com/7.x/lorelei/png?seed=$e',
                           ),
                           title: Text(e),
                           trailing: (activityData.creator == e)
@@ -215,15 +207,15 @@ class ActivityDetailsWidget extends StatelessWidget {
                                     color: Theme.of(context).primaryColor,
                                     borderRadius: BorderRadius.circular(5),
                                   ),
-                                  child: Padding(
-                                      padding: const EdgeInsets.all(3.0),
+                                  child: const Padding(
+                                      padding: EdgeInsets.all(3.0),
                                       child: Text(
                                         'Creator',
                                         style: TextStyle(
                                           color: Colors.white,
                                         ),
                                       )))
-                              : SizedBox(),
+                              : const SizedBox(),
                         );
                       },
                     ),

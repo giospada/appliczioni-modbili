@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:sport_mates/pages/search/filter_data.dart';
-import 'package:sport_mates/utils.dart';
 
 class DialogFilter extends StatefulWidget {
   final FilterData filterData;
@@ -22,21 +21,20 @@ class _DialogFilterState extends State<DialogFilter> {
   Widget build(BuildContext context) {
     List<String> allSports = Config().sports + [Config().nullSport];
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       child: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Text('Filters', style: Theme.of(context).textTheme.bodyLarge),
-              SizedBox(height: 20),
+              Text('Filtri', style: Theme.of(context).textTheme.bodyLarge),
+              const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Select a sport'),
+                  const Text('Seleziona uno sport'),
                   DropdownButton<String>(
-                    hint: Text('Select Sport'),
                     value: filterData.selectedSport,
                     onChanged: (String? value) {
                       setState(() {
@@ -54,7 +52,7 @@ class _DialogFilterState extends State<DialogFilter> {
                 ],
               ),
               SwitchListTile(
-                title: Text('Max Price'),
+                title: const Text('Prezzo massimo'),
                 value: filterData.price,
                 onChanged: (bool value) {
                   setState(() {
@@ -63,14 +61,14 @@ class _DialogFilterState extends State<DialogFilter> {
                 },
               ),
               AnimatedContainer(
-                duration: Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 200),
                 child: filterData.price
                     ? Padding(
                         padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
                         child: Column(
                           children: [
                             Text(
-                                'Max Price: ${filterData.maxPrice.toStringAsFixed(2)}'),
+                                'Prezzo Massimo: ${filterData.maxPrice.toStringAsFixed(2)}'),
                             Slider(
                               value: filterData.maxPrice,
                               min: 0,
@@ -87,12 +85,12 @@ class _DialogFilterState extends State<DialogFilter> {
                       )
                     : Container(),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               _buildDateSelector(
                 context: context,
-                title: 'Select start date',
+                title: 'Seleziona la data di partenza',
                 selectedDate: filterData.startDate,
                 onDateSelected: (DateTime date) {
                   setState(() {
@@ -100,12 +98,12 @@ class _DialogFilterState extends State<DialogFilter> {
                   });
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               _buildDateSelector(
                 context: context,
-                title: 'Select end date',
+                title: 'Seleziona la data di fine',
                 selectedDate: filterData.endDate,
                 onDateSelected: (DateTime date) {
                   setState(() {
@@ -113,11 +111,11 @@ class _DialogFilterState extends State<DialogFilter> {
                   });
                 },
               ),
-              SizedBox(
+              const SizedBox(
                 height: 10,
               ),
               ElevatedButton(
-                child: Text('Apply Filters'),
+                child: const Text('Applica i filtri'),
                 onPressed: () => Navigator.of(context).pop(filterData),
               ),
             ],
@@ -150,14 +148,14 @@ class _DialogFilterState extends State<DialogFilter> {
           },
         ),
         if (selectedDate != null)
-          SizedBox(
+          const SizedBox(
             height: 5,
             width: 5,
           ),
         if (selectedDate != null)
           Chip(
             label: Text(
-              '${selectedDate!.day}/${selectedDate.month}',
+              '${selectedDate.day}/${selectedDate.month}',
             ),
             onDeleted: () => setState(() {
               if (title.contains('start')) {

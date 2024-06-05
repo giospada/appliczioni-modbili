@@ -10,13 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:sport_mates/config/auth_provider.dart';
 import 'package:sport_mates/data/activity.dart';
 import 'package:sport_mates/config/config.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:sport_mates/pages/general_purpuse/loader.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:maps_launcher/maps_launcher.dart';
 import 'package:provider/provider.dart';
 
 enum _Action { join, leave, delete }
@@ -27,7 +24,7 @@ Future<http.Response> leave(String token, int id) async {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': 'Bearer ${token}'
+      'Authorization': 'Bearer $token'
     },
   );
   if (response.statusCode != 200) {
@@ -42,7 +39,7 @@ Future<http.Response> delete(String token, int id) async {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': 'Bearer ${token}'
+      'Authorization': 'Bearer $token'
     },
   );
   if (response.statusCode != 200) {
@@ -57,7 +54,7 @@ Future<http.Response> join(String token, int id) async {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      'Authorization': 'Bearer ${token}'
+      'Authorization': 'Bearer $token'
     },
     body: json.encode({"activityId": id, 'username': 'testuser'}),
   );
@@ -78,7 +75,6 @@ class ActivityDetailsPage extends StatelessWidget {
                   AndroidFlutterLocalNotificationsPlugin>()
               ?.areNotificationsEnabled() ??
           false;
-      print('granted: $granted');
     }
   }
 
@@ -107,7 +103,6 @@ class ActivityDetailsPage extends StatelessWidget {
 
       final bool? grantedNotificationPermission =
           await androidImplementation?.requestNotificationsPermission();
-      print('grantedNotificationPermission: ${grantedNotificationPermission}');
     }
   }
 
@@ -179,7 +174,7 @@ class ActivityDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Activity Details'),
+        title: const Text('Activity Details'),
       ),
       body: ActivityDetailsWidget(
         activityData: activityData,
@@ -194,7 +189,7 @@ class ActivityDetailsPage extends StatelessWidget {
                           onPressed: () async {
                             await asyncRouteOperation(context, _Action.delete);
                           },
-                          child: Wrap(
+                          child: const Wrap(
                             children: [
                               Icon(Icons.delete, size: 20),
                               SizedBox(width: 10),
@@ -205,35 +200,73 @@ class ActivityDetailsPage extends StatelessWidget {
                           onPressed: () async {
                             await asyncRouteOperation(context, _Action.leave);
                           },
-                          child: Wrap(
+                          child: const Wrap(
                             children: [
                               Icon(Icons.exit_to_app, size: 20),
                               SizedBox(width: 10),
                               Text('Leave Activity'),
                             ],
                           )),
-                  IconButton(
-                      onPressed: () async {
-                        DateTime.now().add(Duration(
-                          seconds: 10,
-                        ));
+                  FutureBuilder(
+                    future: getActiveNotification(),
+                    builder: (BuildContext context, AsyncSnapshot snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SizedBox();
+                      } else {
+                        bool isScheduled = snapshot.data == activityData.id;
 
-                        await _requestPermissions();
-                        await _isAndroidPermissionGranted();
-
-                        scheduleNotification(
-                            activityData.time,
-                            activityData.id,
-                            "${activityData.attributes.sport} Ti aspetta",
-                            activityData.description);
-                      },
-                      icon: Icon(Icons.notification_add))
+                        return StatefulBuilder(
+                          builder:
+                              (BuildContext context, StateSetter setState) {
+                            return isScheduled
+                                ? IconButton(
+                                    onPressed: () async {
+                                      await cancelNotification(activityData.id);
+                                      setState(() {
+                                        isScheduled = false;
+                                      });
+                                    },
+                                    icon:
+                                        const Icon(Icons.notifications_active))
+                                : IconButton(
+                                    onPressed: () async {
+                                      if (Config().notifyBefore == null) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                                'Le notifiche non sono abilitate nelle impostazioni'),
+                                          ),
+                                        );
+                                      } else {
+                                        var time = activityData.time.subtract(
+                                            Duration(
+                                                minutes:
+                                                    Config().notifyBefore!));
+                                        await _requestPermissions();
+                                        await _isAndroidPermissionGranted();
+                                        scheduleNotification(
+                                            time,
+                                            activityData.id,
+                                            "${activityData.attributes.sport} Ti aspetta",
+                                            activityData.description);
+                                        setState(() {
+                                          isScheduled = true;
+                                        });
+                                      }
+                                    },
+                                    icon: const Icon(Icons.notification_add));
+                          },
+                        );
+                      }
+                    },
+                  )
                 ])
               : ElevatedButton(
                   onPressed: () async {
                     await asyncRouteOperation(context, _Action.join);
                   },
-                  child: Wrap(
+                  child: const Wrap(
                     children: [
                       Icon(Icons.add, size: 20),
                       SizedBox(width: 10),

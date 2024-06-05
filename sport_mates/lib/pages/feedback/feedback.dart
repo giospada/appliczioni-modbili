@@ -1,15 +1,14 @@
-import 'package:draggable_bottom_sheet/draggable_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:sport_mates/config/auth_provider.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:sport_mates/config/data_provider.dart';
 import 'package:sport_mates/data/activity.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:sport_mates/pages/feedback/rating_stars.dart';
 import 'package:http/http.dart' as http;
 import 'package:sport_mates/pages/general_purpuse/activity_details.dart';
 import 'dart:convert';
+import 'package:sport_mates/data/feedback.dart';
 
 import 'package:sport_mates/pages/general_purpuse/loader.dart';
 
@@ -23,30 +22,82 @@ class AddFeedbackScreen extends StatefulWidget {
 }
 
 class _AddFeedbackScreenState extends State<AddFeedbackScreen> {
-  final _formKey = GlobalKey<FormState>();
-  String _comment = '';
-  int _rating = 0;
+  AlertDialog createDialog(BuildContext context, auth) {
+    String comment = '';
+    int rating = 0;
+    return AlertDialog(
+      title: const Text('Lascia un feedback per l\' attività'),
+      content: StatefulBuilder(
+        builder: (context, setState) => SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(15, 8, 15, 8),
+                child: Form(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      TextFormField(
+                        decoration:
+                            const InputDecoration(labelText: 'Commento'),
+                        onChanged: (value) {
+                          setState(() {
+                            comment = value;
+                          });
+                        },
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      StarRatingWidget(
+                        rating: rating as double,
+                        onRatingChanged: (newRating) {
+                          setState(
+                            () {
+                              rating = newRating as int;
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        ElevatedButton(
+            child: Text('Chiudi'),
+            onPressed: () {
+              Navigator.pop(context);
+            }),
+        ElevatedButton(
+            child: Text('Manda'),
+            onPressed: () {
+              Navigator.pop(context, (comment, rating));
+            }),
+      ],
+    );
+  }
 
-  Future<http.Response> submitFeedback(String token, String username,
-      int activityId, int rating, String comment) async {
+  Future<http.Response> submitFeedback(
+      String token, FeedbackActivity feedback) async {
     final response = await http.post(
         Uri.https(Config().host, 'feedback'), // replace with your API URL
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token'
         },
-        body: json.encode(<String, dynamic>{
-          'username': username,
-          'activity_id': activityId,
-          'rating': rating,
-          'comment': comment,
-        }));
+        body: json.encode(feedback.toJson()));
 
     if (response.statusCode == 200) {
+      Provider.of<DataProvider>(context, listen: false).addFeedback(feedback);
       return response;
     } else {
       // If the server did not return a 200 OK response, then throw an exception.
-      throw Exception('Failed to submit feedback');
+      throw Exception('Impossible inviare il feedback');
     }
   }
 
@@ -60,136 +111,49 @@ class _AddFeedbackScreenState extends State<AddFeedbackScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Feedback'),
+        title: Text('Aggiungi un ricordo'),
       ),
-      body: DraggableBottomSheet(
-        minExtent: 200,
-        useSafeArea: false,
-        curve: Curves.easeIn,
-        previewWidget: _previewWidget(),
-        expandedWidget: _expandedWidget(auth),
-        duration: const Duration(milliseconds: 10),
-        maxExtent: MediaQuery.of(context).size.height * 0.8,
-        backgroundWidget: ActivityDetailsWidget(
-          activityData: activity,
-          position: pos,
-        ),
-        onDragging: (_) {},
+      body: ActivityDetailsWidget(
+        activityData: activity,
+        position: pos,
       ),
-    );
-  }
+      persistentFooterButtons: [
+        Center(
+          child: FilledButton(
+              onPressed: () async {
+                (String, int)? toSubmit = await showDialog(
+                    context: context,
+                    builder: (context) => createDialog(context, auth));
 
-  Widget _previewWidget() {
-    return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-          border: Border.all(
-            color: Theme.of(context).dividerColor,
-            width: 1,
-          ),
-        ),
-        child: Column(children: <Widget>[
-          Container(
-            width: 40,
-            height: 6,
-            decoration: BoxDecoration(
-              color: Theme.of(context).dividerColor,
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Drag Me',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ]));
-  }
-
-  Widget _expandedWidget(auth) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-        border: Border.all(
-          color: Theme.of(context).dividerColor,
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: <Widget>[
-          Icon(Icons.keyboard_arrow_down,
-              size: 30, color: Theme.of(context).dividerColor),
-          const SizedBox(height: 8),
-          Padding(
-            padding: EdgeInsets.fromLTRB(15, 8, 15, 8),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Comment'),
-                    onSaved: (value) {
-                      setState(() {
-                        _comment = value ?? '';
-                      });
-                    },
-                  ),
-                  StarRatingWidget(
-                    rating: _rating as double,
-                    onRatingChanged: (newRating) {
-                      setState(
-                        () {
-                          _rating = newRating as int;
-                        },
-                      );
-                    },
-                  ),
-                  ElevatedButton(
-                      child: Text('Submit'),
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          _formKey.currentState!.save();
-                          final data = await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AsyncLoaderPage(
-                                  asyncOperation: () async =>
-                                      await submitFeedback(
-                                          auth!,
-                                          'test',
-                                          widget.activity.id,
-                                          _rating,
-                                          _comment),
-                                ),
-                              ));
-                          if (data is Exception) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text('Failed to join activity')));
-                          } else {
-                            Navigator.pop(context);
-                          }
-                        }
-                      }),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+                if (toSubmit != null) {
+                  final comment = toSubmit.$1;
+                  final rating = toSubmit.$2;
+                  final data = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AsyncLoaderPage(
+                            asyncOperation: () async => await submitFeedback(
+                                auth!,
+                                FeedbackActivity(
+                                  activityId: widget.activity.id,
+                                  rating: rating,
+                                  comment: comment,
+                                  username: 'test',
+                                ))),
+                      ));
+                  if (data is Exception) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Impossibile inviare il feedback')));
+                  } else {
+                    Navigator.pop(context);
+                  }
+                }
+              },
+              child: const Text(
+                "Aggiungi un Ricordo",
+              )),
+        )
+      ],
     );
   }
 }

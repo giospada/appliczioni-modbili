@@ -2,11 +2,8 @@ import 'package:async/async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:http/http.dart' as http;
 import 'package:sport_mates/pages/general_purpuse/maps_search.dart';
-import 'dart:convert';
 
 import 'package:sport_mates/utils.dart';
 
@@ -53,21 +50,21 @@ class _PosSelectorWidgetState extends State<PosSelectorWidget> {
                       onMapReady: () {
                         mapController.mapEventStream.listen((event) {
                           if (event is MapEventMove) {
-                            event = event as MapEventMove;
+                            event = event;
                             setState(() {
                               lat = event.camera.center.latitude;
                               long = event.camera.center.longitude;
                             });
                           }
                           if (event is MapEventScrollWheelZoom) {
-                            event = event as MapEventScrollWheelZoom;
+                            event = event;
                             setState(() {
                               lat = event.camera.center.latitude;
                               long = event.camera.center.longitude;
                             });
                           }
                           if (event is MapEventDoubleTapZoom) {
-                            event = event as MapEventDoubleTapZoom;
+                            event = event;
                             setState(() {
                               lat = event.camera.center.latitude;
                               long = event.camera.center.longitude;
@@ -86,11 +83,9 @@ class _PosSelectorWidgetState extends State<PosSelectorWidget> {
                           width: 80.0,
                           height: 80.0,
                           point: LatLng(lat, long),
-                          child: Container(
-                            child: Icon(
-                              Icons.location_on,
-                              size: 50,
-                            ),
+                          child: const Icon(
+                            Icons.location_on,
+                            size: 50,
                           ),
                         ),
                       ],
@@ -112,9 +107,9 @@ class _PosSelectorWidgetState extends State<PosSelectorWidget> {
                   right: 10,
                   child: Container(
                     clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(color: Colors.white60),
+                    decoration: const BoxDecoration(color: Colors.white60),
                     child: IconButton(
-                      icon: Icon(Icons.my_location),
+                      icon: const Icon(Icons.my_location),
                       onPressed: () async {
                         mapController.move(await determinePosition(), 15);
                       },
@@ -132,7 +127,7 @@ class _PosSelectorWidgetState extends State<PosSelectorWidget> {
                     onPressed: () {
                       Navigator.of(context).pop(LatLng(lat, long));
                     },
-                    child: const Text('Choose')),
+                    child: const Text('Scegli questa posizione')),
               ],
             ),
           ),

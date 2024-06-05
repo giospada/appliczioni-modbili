@@ -53,7 +53,7 @@ class _LoginSignUpWidgetState extends State<LoginSignUpWidget> {
           .login(responseData['access_token']);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(json.decode(response.body)['message'])));
+          SnackBar(content: Text(json.decode(response.body)['detail'])));
     }
     setState(
       () {
@@ -69,24 +69,24 @@ class _LoginSignUpWidgetState extends State<LoginSignUpWidget> {
       child: Column(
         children: <Widget>[
           Column(children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0), // Change the value as needed
-              child: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 500),
-                transitionBuilder: (Widget child, Animation<double> animation) {
-                  return ScaleTransition(child: child, scale: animation);
-                },
-                child: SvgPicture.asset(
-                  action != ActionStateLogin.login
-                      ? 'assets/svg/sign_up.svg'
-                      : 'assets/svg/login.svg',
-                  height: 100,
-                  width: 100,
-                  key: ValueKey<String>(action.toString()),
-                ),
+            const SizedBox(
+              height: 20,
+            ),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 500),
+              transitionBuilder: (Widget child, Animation<double> animation) {
+                return ScaleTransition(child: child, scale: animation);
+              },
+              child: SvgPicture.asset(
+                action != ActionStateLogin.login
+                    ? 'assets/svg/sign_up.svg'
+                    : 'assets/svg/login.svg',
+                height: 150,
+                width: 150,
+                key: ValueKey<String>(action.toString()),
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 20),
           ]),
           Expanded(
             child: Card(
@@ -145,7 +145,7 @@ class _LoginSignUpWidgetState extends State<LoginSignUpWidget> {
                         : const SizedBox(height: 0),
                     const SizedBox(height: 10),
                     (loading)
-                        ? CircularProgressIndicator()
+                        ? const CircularProgressIndicator()
                         : ElevatedButton(
                             onPressed: () => _submit(),
                             child: Text(action == ActionStateLogin.login
