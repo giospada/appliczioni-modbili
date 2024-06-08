@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:sport_mates/data/activity.dart';
+import 'package:sport_mates/data/activity_data.dart';
 import 'package:sport_mates/pages/general_purpuse/map_markers.dart';
 import 'package:sport_mates/pages/general_purpuse/maps_search.dart';
 
@@ -78,7 +78,7 @@ class _RadiusSelectorWidgetState extends State<RadiusSelectorWidget> {
                     children: [
                           TileLayer(
                             urlTemplate:
-                                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                           ) as Widget
                         ] +
                         createMarkers(

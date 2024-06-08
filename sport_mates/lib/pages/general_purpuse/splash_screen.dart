@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:sport_mates/pages/home.dart';
 import 'package:sport_mates/pages/home.dart';
 import 'dart:math';
 
@@ -35,14 +33,15 @@ class _SplashScreenState extends State<SplashScreen>
       duration: const Duration(seconds: 4),
       vsync: this,
     )..forward();
-    _animation = CurvedAnimation(parent: _controller!, curve: SpringCurve());
+    _animation =
+        CurvedAnimation(parent: _controller!, curve: const SpringCurve());
 
     _navigateToHome();
   }
 
   _navigateToHome() async {
     // Wait for the animation to finish
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
     // Navigate to the next page
 
     Navigator.pushReplacement(

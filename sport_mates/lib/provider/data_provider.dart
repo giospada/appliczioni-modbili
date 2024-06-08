@@ -3,9 +3,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:convert';
-import 'package:sport_mates/data/activity.dart';
-import 'package:sport_mates/data/feedback.dart';
+import 'package:sport_mates/data/activity_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:sport_mates/data/feedback_data.dart';
 
 class DataProvider with ChangeNotifier {
   final storage = const FlutterSecureStorage();
@@ -54,10 +54,11 @@ class DataProvider with ChangeNotifier {
     }
   }
 
-  Future<void> saveToStorage(DateTime lastUpdate) async {
+  Future<void> saveToStorage() async {
     await storage.write(key: 'activities', value: json.encode(activities));
     await storage.write(key: 'feedbacks', value: json.encode(feedbacks));
-    await storage.write(key: 'lastUpdate', value: lastUpdate.toIso8601String());
+    await storage.write(
+        key: 'lastUpdate', value: lastUpdate!.toLocal().toIso8601String());
     await storage.write(key: 'lastPos', value: json.encode(lastPos));
   }
 
@@ -105,12 +106,12 @@ class DataProvider with ChangeNotifier {
       lastUpdate = lastUpdate.subtract(lastUpdate.timeZoneOffset);
       var ids = await _loadIds();
       var feedback = await loadFeedback(token);
-      var updated_activities = await _loadAllActivitys(ids.cast<int>());
-      var deleted_activities = await _deletedActivities(token);
-      update_activity(updated_activities, deleted_activities);
-      this.feedbacks = feedback;
+      var updatedActivities = await _loadAllActivitys(ids.cast<int>());
+      var deletedActivities = await _deletedActivities(token);
+      update_activity(updatedActivities, deletedActivities);
+      feedbacks = feedback;
       this.lastUpdate = DateTime.now();
-      await saveToStorage(lastUpdate);
+      await saveToStorage();
       loading = false;
       isConnected = true;
       notifyListeners();

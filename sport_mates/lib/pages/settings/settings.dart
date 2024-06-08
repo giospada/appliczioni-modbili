@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sport_mates/config/auth_provider.dart';
+import 'package:sport_mates/provider/auth_provider.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:provider/provider.dart';
-import 'package:sport_mates/config/data_provider.dart';
+import 'package:sport_mates/provider/data_provider.dart';
 
 class SettingsPage extends StatelessWidget {
   @override

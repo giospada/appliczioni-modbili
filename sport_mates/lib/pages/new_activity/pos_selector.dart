@@ -75,7 +75,7 @@ class _PosSelectorWidgetState extends State<PosSelectorWidget> {
                   children: [
                     TileLayer(
                       urlTemplate:
-                          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                          "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                     ),
                     MarkerLayer(
                       markers: [

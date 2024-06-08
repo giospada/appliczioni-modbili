@@ -1,5 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:sport_mates/data/activity.dart';
+import 'package:sport_mates/data/activity_data.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -136,5 +136,18 @@ String getMeterOrKmDistance(LatLng p1, LatLng p2) {
     return "${distance.toStringAsFixed(0)} m";
   } else {
     return "${(distance / 1000).toStringAsFixed(2)} km";
+  }
+}
+
+String howMuchAgo(DateTime date) {
+  Duration difference = DateTime.now().difference(date);
+  if (difference.inDays > 0) {
+    return "${difference.inDays} giorni fa";
+  } else if (difference.inHours > 0) {
+    return "${difference.inHours} ore fa";
+  } else if (difference.inMinutes > 0) {
+    return "${difference.inMinutes} minuti fa";
+  } else {
+    return "pochi secondi fa";
   }
 }

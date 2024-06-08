@@ -1,16 +1,16 @@
 import 'package:latlong2/latlong.dart';
-import 'package:sport_mates/data/activity.dart';
+import 'package:sport_mates/data/activity_data.dart';
 import 'package:sport_mates/pages/new_activity/pos_selector.dart';
 import 'package:sport_mates/pages/new_activity/layout_widget.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_mates/config/auth_provider.dart';
+import 'package:sport_mates/provider/auth_provider.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:sport_mates/pages/general_purpuse/loader.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:sport_mates/config/data_provider.dart';
+import 'package:sport_mates/provider/data_provider.dart';
 import 'package:provider/provider.dart';
 
 class CreateActivityWidget extends StatefulWidget {
@@ -67,21 +67,21 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
   bool _validatePage() {
     if (_currentPage == 0) {
       if (lati == 0 || long == 0) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please pick a location')));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Scegli la posizione')));
         return true;
       }
     } else if (_currentPage == 1) {
       if (selectedDate == null) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Please pick a date')));
+            .showSnackBar(const SnackBar(content: Text('Scegli il giorno')));
         return true;
       }
     } else if (_currentPage == 2) {
       bool allFilled = descriptionController.text.isNotEmpty;
       if (!allFilled) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please enter a description')));
+            const SnackBar(content: Text('Inserisci la descrizione')));
         return true;
       }
     }
@@ -96,12 +96,12 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
 
       if (data is http.Response && data.statusCode == 200) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text('Activity created')));
+            .showSnackBar(const SnackBar(content: Text('Attività creata')));
         Activity activity = Activity.fromJson(jsonDecode(data.body));
         Navigator.pop(context, activity);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to create activity')));
+            const SnackBar(content: Text('Impossible creare attività')));
       }
     }
   }
@@ -156,7 +156,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
       Provider.of<DataProvider>(context, listen: false).load(token);
       return response;
     } else {
-      throw Exception('Failed to submit activity, ${response.body}');
+      throw Exception('Impossibile salvare l\'attività ${response.body}');
     }
   }
 
@@ -172,33 +172,37 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
           children: [
             LayoutWidget(
                 svgPath: 'assets/svg/best_place.svg',
-                title: 'Pick Location',
-                description: 'Pick the location of the activity',
-                child: ElevatedButton(
-                  onPressed: () async {
-                    final pos = await determinePosition();
-                    final result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PosSelectorWidget(pos),
-                      ),
-                    ) as LatLng;
-                    if (result != null) {
-                      long = result.longitude;
-                      lati = result.latitude;
-                    }
-                  },
-                  child: Column(
-                    children: [
-                      const Text('Pick Location'),
-                      Text(address ?? ' ')
-                    ],
-                  ),
+                title: 'Scegli un luogo',
+                description: 'Scegli il luogo dell\'attività',
+                child: Column(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () async {
+                        final pos = await determinePosition();
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PosSelectorWidget(pos),
+                          ),
+                        ) as LatLng;
+                        setState(() {
+                          long = result.longitude;
+                          lati = result.latitude;
+                        });
+                      },
+                      child: const Text('Scegli una posizione'),
+                    ),
+                    if (lati != 0 && long != 0)
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Text('Posizione selezionata'),
+                      )
+                  ],
                 )),
             LayoutWidget(
                 svgPath: 'assets/svg/online_calendar.svg',
-                title: 'Pick Date',
-                description: 'Pick the date of the activity',
+                title: 'Scegli la data',
+                description: 'Scegli la data e l\'ora dell\'attività',
                 child: Column(
                   children: [
                     ElevatedButton(
@@ -208,8 +212,8 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                     Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(selectedDate == null
-                            ? 'No date selected'
-                            : 'Selected date: ${displayFormattedDate(selectedDate!)}'))
+                            ? 'Nessuna data selezionata'
+                            : 'Data selezionata: ${displayFormattedDate(selectedDate!)}'))
                   ],
                 )),
             LayoutWidget(
@@ -225,12 +229,12 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                   key: ValueKey<String>(_selectedSport),
                 ),
               ),
-              title: 'Activity Details',
-              description: 'Enter the details of the activity',
+              title: 'Aggiungi i dettagli',
+              description: 'Aggiungi i dettagli dell\'attività',
               child: Column(
                 children: [
                   TextFormField(
-                    decoration: const InputDecoration(labelText: 'Description'),
+                    decoration: const InputDecoration(labelText: 'Descrizione'),
                     controller: descriptionController,
                   ),
                   DropdownButtonFormField<String>(
@@ -249,7 +253,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                     },
                   ),
                   SwitchListTile(
-                    title: const Text('Is the activity free?'),
+                    title: const Text('È gratis?'),
                     value: _isFree,
                     onChanged: (bool value) {
                       setState(() {
@@ -263,7 +267,7 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                     child: !_isFree
                         ? TextFormField(
                             decoration:
-                                const InputDecoration(labelText: 'Price'),
+                                const InputDecoration(labelText: 'Prezzo'),
                             keyboardType: TextInputType.number,
                             onChanged: (value) {
                               value = value == '' ? '0' : value;
@@ -274,11 +278,11 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                   ),
                   TextFormField(
                       decoration:
-                          const InputDecoration(labelText: 'Number of People'),
+                          const InputDecoration(labelText: "Numero di persone"),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         value = value == '' ? '0' : value;
-                        numberOfPeople = int.parse(value ?? '0');
+                        numberOfPeople = int.parse(value);
                       })
                 ],
               ),
@@ -293,12 +297,12 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
               //make it little and gray
               backgroundColor: Theme.of(context).colorScheme.secondary,
               mini: true,
-              heroTag: 'back',
+              heroTag: 'indietro',
               child: const Icon(Icons.navigate_before),
             ),
             FloatingActionButton(
                 onPressed: nextPageFunction,
-                heroTag: 'next',
+                heroTag: 'prossimo',
                 child: const Icon(
                   Icons.navigate_next,
                 )),

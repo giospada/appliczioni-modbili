@@ -1,12 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
-import 'package:sport_mates/data/activity.dart';
+import 'package:sport_mates/data/activity_data.dart';
 import 'package:sport_mates/pages/general_purpuse/activity_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sport_mates/pages/general_purpuse/map_markers.dart';
 
@@ -44,9 +41,9 @@ class _MapSearchState extends State<MapSearch> {
   @override
   void didUpdateWidget(covariant MapSearch oldWidget) {
     super.didUpdateWidget(oldWidget);
-    this.activities = [...widget.activities];
-    this.pos = widget.pos;
-    this.radius = widget.radius;
+    activities = [...widget.activities];
+    pos = widget.pos;
+    radius = widget.radius;
     mapController.move(pos, 13);
     setState(() {});
   }
@@ -56,7 +53,7 @@ class _MapSearchState extends State<MapSearch> {
     var marker =
         createMarkers(mapController, activities, pos, radius, (Activity t) {
       controller.animateToPage(activities.indexOf(t),
-          duration: Duration(milliseconds: 500), curve: Curves.ease);
+          duration: const Duration(milliseconds: 500), curve: Curves.ease);
       mapController.move(t.position, 15);
     });
 
@@ -71,15 +68,15 @@ class _MapSearchState extends State<MapSearch> {
                   onMapReady: () {
                     mapController.mapEventStream.listen((event) {
                       if (event is MapEventMove) {
-                        event = event as MapEventMove;
+                        event = event;
                         setState(() {});
                       }
                       if (event is MapEventScrollWheelZoom) {
-                        event = event as MapEventScrollWheelZoom;
+                        event = event;
                         setState(() {});
                       }
                       if (event is MapEventDoubleTapZoom) {
-                        event = event as MapEventDoubleTapZoom;
+                        event = event;
                         setState(() {});
                       }
                     });
@@ -87,12 +84,12 @@ class _MapSearchState extends State<MapSearch> {
               children: [
                     TileLayer(
                       urlTemplate:
-                          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                          "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                     ) as Widget
                   ] +
                   marker),
         ),
-        Container(
+        SizedBox(
           height: 150,
           child: PageView.builder(
             itemCount: activities.length,

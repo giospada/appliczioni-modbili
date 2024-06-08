@@ -1,6 +1,6 @@
 import 'package:latlong2/latlong.dart';
-import 'package:sport_mates/config/auth_provider.dart';
-import 'package:sport_mates/config/data_provider.dart';
+import 'package:sport_mates/provider/auth_provider.dart';
+import 'package:sport_mates/provider/data_provider.dart';
 import 'package:sport_mates/pages/feedback/history.dart';
 import 'package:sport_mates/pages/general_purpuse/activity_card.dart';
 import 'package:sport_mates/pages/search/choose_position.dart';
@@ -10,7 +10,7 @@ import 'package:sport_mates/pages/search/map_search.dart';
 import 'package:sport_mates/pages/upcoming_activity/upcoming_activity.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_mates/data/activity.dart';
+import 'package:sport_mates/data/activity_data.dart';
 import 'package:sport_mates/pages/new_activity/new_activity.dart';
 import 'package:sport_mates/pages/settings/settings.dart';
 import 'package:provider/provider.dart';
@@ -59,6 +59,7 @@ class _SearchPageStateFilter extends State<_SearchPage>
   double radius = 5000;
   List<Activity> displayActivities = [];
   String token = '';
+  final SearchController searchController = SearchController();
 
   late TabController _tabController;
   FilterData filterData = FilterData.init();
@@ -134,6 +135,7 @@ class _SearchPageStateFilter extends State<_SearchPage>
           child: Column(
             children: [
               SearchAnchor.bar(
+                searchController: searchController,
                 isFullScreen: true,
                 suggestionsBuilder: (context, controller) {
                   return [
@@ -204,19 +206,29 @@ class _SearchPageStateFilter extends State<_SearchPage>
                   ),
                 ],
               ),
-              if (activityData.loading)
+              if (!activityData.loading)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
-                      Row(
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
                         children: [
-                          if (activityData.isConnected)
+                          if (activityData.isConnected &&
+                              activityData.lastUpdate != null)
                             Text(
-                                'ultimo aggiornamento ${activityData.lastUpdate}')
-                          else if (activityData.isConnected)
+                                'Ultimo aggiornamento ${howMuchAgo(activityData.lastUpdate!)}')
+                          else if (!activityData.isConnected &&
+                              activityData.lastUpdate != null)
                             Text(
-                                'Non connesso, ultimo aggiornamento ${activityData.lastUpdate}'),
+                                'Non connesso, ultimo aggiornamento ${howMuchAgo(activityData.lastUpdate!)}'),
+                          IconButton(
+                            onPressed: () {
+                              Provider.of<DataProvider>(context, listen: false)
+                                  .load(token);
+                            },
+                            icon: const Icon(Icons.replay_outlined),
+                          )
                         ],
                       ),
                       const Divider(),

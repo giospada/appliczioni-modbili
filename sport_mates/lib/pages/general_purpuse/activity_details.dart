@@ -1,6 +1,6 @@
 import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_mates/data/activity.dart';
+import 'package:sport_mates/data/activity_data.dart';
 import 'package:flutter_map/flutter_map.dart';
 
 import 'package:latlong2/latlong.dart';
@@ -93,7 +93,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                           children: [
                             Text(
                               textAlign: TextAlign.start,
-                              'Description',
+                              'Descrizione',
                               style: Theme.of(context).textTheme.headlineSmall,
                             ),
                             Text(
@@ -181,7 +181,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                       child: Column(
                         children: [
                           Text(
-                            'Participants',
+                            'Partecipanti',
                             style: Theme.of(context).textTheme.headlineSmall,
                           ),
                         ],
@@ -210,7 +210,7 @@ class ActivityDetailsWidget extends StatelessWidget {
                                   child: const Padding(
                                       padding: EdgeInsets.all(3.0),
                                       child: Text(
-                                        'Creator',
+                                        'Creatore',
                                         style: TextStyle(
                                           color: Colors.white,
                                         ),

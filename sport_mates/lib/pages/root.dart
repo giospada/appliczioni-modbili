@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:sport_mates/pages/home.dart';
-import 'package:sport_mates/pages/login/login_signup.dart';
-import 'package:sport_mates/pages/new_activity/new_activity.dart';
-import 'package:sport_mates/pages/settings/settings.dart';
 import 'package:sport_mates/pages/general_purpuse/splash_screen.dart';
 import 'package:sport_mates/config/theme.dart';
 

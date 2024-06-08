@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:sport_mates/config/data_provider.dart';
+import 'package:sport_mates/provider/data_provider.dart';
 import 'package:sport_mates/config/theme.dart';
 import 'package:sport_mates/pages/search/Search.dart';
 import 'package:provider/provider.dart';
-import 'package:sport_mates/config/auth_provider.dart';
+import 'package:sport_mates/provider/auth_provider.dart';
 import 'package:sport_mates/pages/login/login_signup.dart';
 
 class Home extends StatelessWidget {

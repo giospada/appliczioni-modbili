@@ -2,13 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:sport_mates/config/data_provider.dart';
+import 'package:sport_mates/provider/data_provider.dart';
 import 'package:sport_mates/main.dart';
 import 'package:sport_mates/pages/general_purpuse/activity_details.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
-import 'package:sport_mates/config/auth_provider.dart';
-import 'package:sport_mates/data/activity.dart';
+import 'package:sport_mates/provider/auth_provider.dart';
+import 'package:sport_mates/data/activity_data.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:http/http.dart' as http;
 
@@ -174,7 +174,7 @@ class ActivityDetailsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Activity Details'),
+        title: const Text('Dettagli Attività'),
       ),
       body: ActivityDetailsWidget(
         activityData: activityData,
@@ -183,7 +183,9 @@ class ActivityDetailsPage extends StatelessWidget {
       persistentFooterButtons: [
         Center(
           child: isParticipant
-              ? Row(children: [
+              ? Row(
+              mainAxisAlignment: MainAxisAlignment.center ,
+              children: [
                   (activityData.creator == user)
                       ? OutlinedButton(
                           onPressed: () async {
@@ -225,6 +227,13 @@ class ActivityDetailsPage extends StatelessWidget {
                                       setState(() {
                                         isScheduled = false;
                                       });
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'Notifica disabilitata'),
+                                        ),
+                                      );
                                     },
                                     icon:
                                         const Icon(Icons.notifications_active))
@@ -253,6 +262,13 @@ class ActivityDetailsPage extends StatelessWidget {
                                         setState(() {
                                           isScheduled = true;
                                         });
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              'Notifica abilitata'),
+                                        ),
+                                      );
                                       }
                                     },
                                     icon: const Icon(Icons.notification_add));
@@ -270,7 +286,7 @@ class ActivityDetailsPage extends StatelessWidget {
                     children: [
                       Icon(Icons.add, size: 20),
                       SizedBox(width: 10),
-                      Text('Join Activity'),
+                      Text('Prendi parte'),
                     ],
                   ),
                 ),

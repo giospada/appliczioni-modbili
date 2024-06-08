@@ -1,5 +1,5 @@
 import 'package:latlong2/latlong.dart';
-import 'package:sport_mates/data/activity.dart';
+import 'package:sport_mates/data/activity_data.dart';
 import 'package:sport_mates/pages/general_purpuse/activity_card.dart';
 import 'package:flutter/material.dart';
 

@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:sport_mates/data/activity.dart';
+import 'package:sport_mates/data/activity_data.dart';
 import 'package:sport_mates/utils.dart';
 
 const double ICON_SIZE = 20;
@@ -104,8 +104,8 @@ List<Widget> createMarkers(
                                         .unproject(cluster.center),
                                     center,
                                     radius)
-                                ? Colors.black87
-                                : Colors.black54,
+                                ? Colors.black54
+                                : Colors.black87,
                             shape: BoxShape.circle,
                           ),
                           child: Center(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:sport_mates/data/activity.dart';
-import 'package:sport_mates/pages/general_purpuse/activity_page.dart';
+import 'package:sport_mates/data/activity_data.dart';
+import 'package:sport_mates/pages/general_purpuse/activity_page_action.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -11,8 +11,10 @@ class ActivityCardWidget extends StatelessWidget {
   final Function? onReturn;
 
   const ActivityCardWidget(
-      {Key? key, required this.activityData, required this.pos, this.onReturn})
-      : super(key: key);
+      {super.key,
+      required this.activityData,
+      required this.pos,
+      this.onReturn});
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +34,13 @@ class ActivityCardWidget extends StatelessWidget {
       },
       child: Card(
         child: Padding(
-          padding: EdgeInsets.fromLTRB(8, 12, 8, 8),
+          padding: const EdgeInsets.fromLTRB(8, 12, 8, 8),
           child: Column(
             children: <Widget>[
               Row(
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(10),
                     child: Icon(sportToIcon[activityData.attributes.sport],
                         size: 40),
                   ),
@@ -48,7 +50,7 @@ class ActivityCardWidget extends StatelessWidget {
                       children: [
                         Text(
                           displayFormattedDate(activityData.time),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                           maxLines: 1,
@@ -64,7 +66,7 @@ class ActivityCardWidget extends StatelessWidget {
                   )
                 ],
               ),
-              Divider(),
+              const Divider(),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -72,21 +74,21 @@ class ActivityCardWidget extends StatelessWidget {
                     children: [
                       Text(
                           "${getMeterOrKmDistance(activityData.position, pos!)} distanza"),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       (activityData.attributes.price == 0)
-                          ? Text(
+                          ? const Text(
                               "Gratis",
                               style: TextStyle(color: Colors.green),
                             )
                           : Text(
-                              activityData.attributes.price.toString() + "€",
+                              "${activityData.attributes.price}€",
                             ),
                     ],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text('restanti '),
+                      const Text('restanti '),
                       Text(
                         restanti.toString(),
                         style: TextStyle(

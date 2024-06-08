@@ -1,14 +1,14 @@
 import 'package:provider/provider.dart';
-import 'package:sport_mates/config/auth_provider.dart';
+import 'package:sport_mates/provider/auth_provider.dart';
 import 'package:sport_mates/config/config.dart';
-import 'package:sport_mates/config/data_provider.dart';
-import 'package:sport_mates/data/activity.dart';
+import 'package:sport_mates/provider/data_provider.dart';
+import 'package:sport_mates/data/activity_data.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_mates/pages/feedback/rating_stars.dart';
 import 'package:http/http.dart' as http;
 import 'package:sport_mates/pages/general_purpuse/activity_details.dart';
 import 'dart:convert';
-import 'package:sport_mates/data/feedback.dart';
+import 'package:sport_mates/data/feedback_data.dart';
 
 import 'package:sport_mates/pages/general_purpuse/loader.dart';
 
@@ -50,11 +50,11 @@ class _AddFeedbackScreenState extends State<AddFeedbackScreen> {
                         height: 10,
                       ),
                       StarRatingWidget(
-                        rating: rating as double,
+                        rating: rating,
                         onRatingChanged: (newRating) {
                           setState(
                             () {
-                              rating = newRating as int;
+                              rating = newRating;
                             },
                           );
                         },

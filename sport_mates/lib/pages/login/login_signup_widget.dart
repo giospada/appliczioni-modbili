@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:sport_mates/config/auth_provider.dart';
+import 'package:sport_mates/provider/auth_provider.dart';
 import 'package:sport_mates/config/config.dart';
 import 'package:sport_mates/pages/login/action_state_login.dart';
 
@@ -39,7 +39,7 @@ class _LoginSignUpWidgetState extends State<LoginSignUpWidget> {
     _formKey.currentState?.save();
     final response = await http.post(
       Uri.https(config.host,
-          '/${ActionStateLogin.login == action ? 'login' : 'sign up'}'),
+          '/${ActionStateLogin.login == action ? 'login' : 'signup'}'),
       body: json.encode({'username': _email, 'password': _password}),
       headers: {
         'Content-Type': 'application/json',
@@ -115,6 +115,7 @@ class _LoginSignUpWidgetState extends State<LoginSignUpWidget> {
                           decoration:
                               const InputDecoration(labelText: 'Password'),
                           obscureText: true,
+                          onChanged: (value) => _password = value ?? '',
                           onSaved: (value) => _password = value ?? '',
                           validator: (value) =>
                               value!.isEmpty ? 'Please enter a password' : null,

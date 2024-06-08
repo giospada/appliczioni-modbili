@@ -61,7 +61,7 @@ class _DialogFilterState extends State<DialogFilter> {
                 },
               ),
               AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
+                duration: const Duration(milliseconds: 1000),
                 child: filterData.price
                     ? Padding(
                         padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
@@ -92,7 +92,7 @@ class _DialogFilterState extends State<DialogFilter> {
                 context: context,
                 title: 'Seleziona la data di partenza',
                 selectedDate: filterData.startDate,
-                onDateSelected: (DateTime date) {
+                onDateSelected: (DateTime? date) {
                   setState(() {
                     filterData.startDate = date;
                   });
@@ -105,7 +105,7 @@ class _DialogFilterState extends State<DialogFilter> {
                 context: context,
                 title: 'Seleziona la data di fine',
                 selectedDate: filterData.endDate,
-                onDateSelected: (DateTime date) {
+                onDateSelected: (DateTime? date) {
                   setState(() {
                     filterData.endDate = date;
                   });
@@ -129,7 +129,7 @@ class _DialogFilterState extends State<DialogFilter> {
       {required BuildContext context,
       required String title,
       DateTime? selectedDate,
-      required Function(DateTime) onDateSelected}) {
+      required Function(DateTime?) onDateSelected}) {
     return Wrap(
       direction: Axis.horizontal,
       children: [
@@ -157,14 +157,9 @@ class _DialogFilterState extends State<DialogFilter> {
             label: Text(
               '${selectedDate.day}/${selectedDate.month}',
             ),
-            onDeleted: () => setState(() {
-              if (title.contains('start')) {
-                filterData.startDate = null;
-              } else {
-                filterData.endDate = null;
-              }
-            }),
+            onDeleted: () => onDateSelected(null),
           ),
+
       ],
     );
   }

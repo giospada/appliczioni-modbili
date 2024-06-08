@@ -1,8 +1,7 @@
 import 'package:provider/provider.dart';
-import 'package:sport_mates/config/auth_provider.dart';
-import 'package:sport_mates/config/data_provider.dart';
-import 'package:sport_mates/data/activity.dart';
-import 'package:sport_mates/data/feedback.dart';
+import 'package:sport_mates/provider/auth_provider.dart';
+import 'package:sport_mates/provider/data_provider.dart';
+import 'package:sport_mates/data/feedback_data.dart';
 import 'package:sport_mates/pages/feedback/feedback_list.dart';
 import 'package:flutter/material.dart';
 
