@@ -40,7 +40,7 @@ class Activity {
   Map<String, dynamic> toJson() {
     return {
       'description': description,
-      'time': time.toIso8601String(),
+      'time': time.toLocal().toIso8601String(),
       'position': {
         'lat': position.latitude,
         'long': position.longitude,

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_mates/data/activity_data.dart';
 import 'package:sport_mates/pages/general_purpuse/activity_page_action.dart';
+import 'package:sport_mates/provider/auth_provider.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -20,6 +22,8 @@ class ActivityCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     int restanti =
         (activityData.numberOfPeople - activityData.participants.length);
+
+    var user = Provider.of<AuthProvider>(context, listen: false).getUsername;
 
     return InkWell(
       onTap: () async {
@@ -48,16 +52,25 @@ class ActivityCardWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          displayFormattedDate(activityData.time),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              displayFormattedDate(activityData.time),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            if (activityData.participants.contains(user))
+                              const Icon(Icons.event_available,
+                                  color: Colors.green),
+                          ],
                         ),
                         Text(
                           activityData.description,
+
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),

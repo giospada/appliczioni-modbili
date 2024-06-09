@@ -1,4 +1,6 @@
 import 'package:latlong2/latlong.dart';
+import 'package:sport_mates/config/config.dart';
+import 'package:sport_mates/pages/general_purpuse/activity_page_static.dart';
 import 'package:sport_mates/provider/auth_provider.dart';
 import 'package:sport_mates/provider/data_provider.dart';
 import 'package:sport_mates/pages/feedback/history.dart';
@@ -26,6 +28,7 @@ class _SearchPageState extends State<SearchPage> {
   @override
   void initState() {
     super.initState();
+    Provider.of<DataProvider>(context, listen: false).loading = true;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       token = authProvider.token;
@@ -87,23 +90,22 @@ class _SearchPageStateFilter extends State<_SearchPage>
   }
 
   Future<void> choosePositionRadius() async {
-    List<Activity> activities =
-        filter(FilterData.init(), activityData.activities);
-
-    var chosenRadius = await Navigator.of(context).push(MaterialPageRoute(
-        builder: (builder) => RadiusSelectorWidget(pos!, radius, activities)));
-
-    radius = chosenRadius.elementAt(0);
-    pos = chosenRadius.elementAt(1);
-    if (pos != null) {
-      Provider.of<DataProvider>(context, listen: false).lastPos = pos!;
+    List<Activity> mapActivities = activityData.activities
+        .where((element) => filterData.isValidActivity(element))
+        .toList();
+    final res = await Navigator.of(context).push(MaterialPageRoute(
+        builder: (builder) =>
+            RadiusSelectorWidget(pos!, radius, mapActivities)));
+    if (res != null) {
+      radius = res.elementAt(0);
+      pos = res.elementAt(1);
+      filterState(filterData);
     }
-    filterState(filterData);
   }
 
   List<Activity> filter(FilterData newFilterData, List<Activity> activities) {
     return activities.where((element) {
-      return newFilterData.isValidActivity(element, pos, radius);
+      return newFilterData.isValidActivityInsideRadius(element, pos, radius);
     }).toList();
   }
 
@@ -126,86 +128,91 @@ class _SearchPageStateFilter extends State<_SearchPage>
     var authProvider = Provider.of<AuthProvider>(context, listen: false);
     final user = authProvider.getUsername!;
     token = authProvider.token!;
-    var upcoming = upcomingFilter(user, activityData.activities, pos);
-
+    var upcoming = upcomingFilter(user, activityData.activities);
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Column(
             children: [
-              SearchAnchor.bar(
-                searchController: searchController,
-                isFullScreen: true,
-                suggestionsBuilder: (context, controller) {
-                  return [
-                        ListTile(
-                            title: const Text('Imposta posizione e raggio'),
-                            leading: const Icon(Icons.location_on),
+              if (!activityData.loading)
+                SearchAnchor.bar(
+                  searchController: searchController,
+                  isFullScreen: true,
+                  suggestionsBuilder: (context, controller) {
+                    return [
+                          ListTile(
+                              title: const Text('Imposta posizione e raggio'),
+                              leading: const Icon(Icons.location_on),
+                              onTap: (activityData.loading)
+                                  ? null
+                                  : () {
+                                      controller.closeView(controller.text);
+                                      choosePositionRadius();
+                                    }),
+                          ListTile(
+                            title: const Text('Imposta i filtri'),
+                            leading: const Icon(Icons.tune),
                             onTap: (activityData.loading)
                                 ? null
-                                : choosePositionRadius),
-                        ListTile(
-                          title: const Text('Imposta i filtri'),
-                          leading: const Icon(Icons.tune),
-                          onTap: (activityData.loading)
-                              ? null
-                              : () async {
-                                  await displayFilters();
-                                  controller.closeView(controller.text ?? "");
-                                },
-                        ),
-                        const Divider(),
-                      ] +
-                      displayActivities
-                          .where((element) =>
-                              element.description
-                                  .toLowerCase()
-                                  .contains(controller.text.toLowerCase()) ||
-                              element.participants.any((element) => element
-                                  .toLowerCase()
-                                  .contains(controller.text.toLowerCase())))
-                          .map((e) => ActivityCardWidget(
-                              activityData: e,
-                              pos: pos,
-                              onReturn: () =>
-                                  controller.closeView(controller.text ?? "")))
-                          .toList();
-                },
-                barLeading: const Icon(Icons.search),
-                barTrailing: <Widget>[
-                  Tooltip(
-                      message: 'Imposta i filtri',
-                      child: Badge(
-                        isLabelVisible: filterData.hasFilter(),
-                        child: IconButton(
-                          onPressed: (activityData.loading)
-                              ? null
-                              : () => displayFilters(),
-                          icon: const Icon(Icons.tune),
-                        ),
-                      )),
-                  Tooltip(
-                    message: 'Imposta la posizione e raggio',
-                    child: IconButton(
-                      onPressed:
-                          (activityData.loading) ? null : choosePositionRadius,
-                      icon: const Icon(Icons.location_on),
+                                : () async {
+                                    controller.closeView(controller.text);
+                                    await displayFilters();
+                                  },
+                          ),
+                          const Divider(),
+                        ] +
+                        displayActivities
+                            .where((element) =>
+                                element.description
+                                    .toLowerCase()
+                                    .contains(controller.text.toLowerCase()) ||
+                                element.participants.any((element) => element
+                                    .toLowerCase()
+                                    .contains(controller.text.toLowerCase())))
+                            .map((e) => ActivityCardWidget(
+                                activityData: e,
+                                pos: pos,
+                                onReturn: () =>
+                                    controller.closeView(controller.text)))
+                            .toList();
+                  },
+                  barLeading: const Icon(Icons.search),
+                  barTrailing: <Widget>[
+                    Tooltip(
+                        message: 'Imposta i filtri',
+                        child: Badge(
+                          isLabelVisible: filterData.hasFilter(),
+                          child: IconButton(
+                            onPressed: (activityData.loading)
+                                ? null
+                                : () => displayFilters(),
+                            icon: const Icon(Icons.tune),
+                          ),
+                        )),
+                    Tooltip(
+                      message: 'Imposta la posizione e raggio',
+                      child: IconButton(
+                        onPressed: (activityData.loading)
+                            ? null
+                            : choosePositionRadius,
+                        icon: const Icon(Icons.location_on),
+                      ),
+                    )
+                  ],
+                ),
+              if (!activityData.loading)
+                TabBar(
+                  controller: _tabController,
+                  tabs: const [
+                    Tab(
+                      icon: Icon(Icons.list),
                     ),
-                  )
-                ],
-              ),
-              TabBar(
-                controller: _tabController,
-                tabs: const [
-                  Tab(
-                    icon: Icon(Icons.list),
-                  ),
-                  Tab(
-                    icon: Icon(Icons.map),
-                  ),
-                ],
-              ),
+                    Tab(
+                      icon: Icon(Icons.map),
+                    ),
+                  ],
+                ),
               if (!activityData.loading)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -213,6 +220,7 @@ class _SearchPageStateFilter extends State<_SearchPage>
                     children: [
                       Wrap(
                         alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           if (activityData.isConnected &&
                               activityData.lastUpdate != null)
@@ -294,7 +302,7 @@ class _SearchPageStateFilter extends State<_SearchPage>
                           await Navigator.of(context).push(MaterialPageRoute(
                               builder: (builder) => UpcoingActivity(
                                   activities: upcomingFilter(
-                                      user, activityData.activities, pos),
+                                      user, activityData.activities),
                                   pos: pos!)));
                         },
                 ),

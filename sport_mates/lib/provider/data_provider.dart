@@ -31,6 +31,11 @@ class DataProvider with ChangeNotifier {
     lastUpdate = null;
   }
 
+  Future<void> updatePosition(LatLng pos) async {
+    lastPos = pos;
+    await saveToStorage();
+  }
+
   Future<void> loadFromStorage() async {
     final String? activitiesString = await storage.read(key: 'activities');
     final String? feedbacksString = await storage.read(key: 'feedbacks');
@@ -102,8 +107,6 @@ class DataProvider with ChangeNotifier {
     notifyListeners();
     await loadFromStorage();
     try {
-      var lastUpdate = DateTime.now();
-      lastUpdate = lastUpdate.subtract(lastUpdate.timeZoneOffset);
       var ids = await _loadIds();
       var feedback = await loadFeedback(token);
       var updatedActivities = await _loadAllActivitys(ids.cast<int>());
@@ -125,7 +128,10 @@ class DataProvider with ChangeNotifier {
   Future<List<int>> _loadIds() async {
     Map<String, dynamic> params = {};
     if (lastUpdate != null) {
-      params['last_update'] = lastUpdate!.toIso8601String();
+      params['last_update'] = lastUpdate!
+          .toUtc()
+          .subtract(const Duration(minutes: 2))
+          .toIso8601String();
     }
     final req =
         await http.get(Uri.https(Config().host, '/activities/search', params));

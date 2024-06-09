@@ -107,7 +107,9 @@ class _PosSelectorWidgetState extends State<PosSelectorWidget> {
                   right: 10,
                   child: Container(
                     clipBehavior: Clip.hardEdge,
-                    decoration: const BoxDecoration(color: Colors.white60),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                    ),
                     child: IconButton(
                       icon: const Icon(Icons.my_location),
                       onPressed: () async {

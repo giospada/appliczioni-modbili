@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="sport_mates"
+        android:label="sport mates"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/app_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -22,6 +22,16 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+
+            </intent-filter>
+             <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
+                <data
+                android:scheme="http"
+                android:host="sportmate" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
@@ -57,5 +67,6 @@
         <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
         <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
         <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+        <uses-permission android:name="android.permission.INTERNET"/>
         <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 </manifest>

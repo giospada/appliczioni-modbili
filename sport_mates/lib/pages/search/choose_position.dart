@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 import 'package:sport_mates/data/activity_data.dart';
 import 'package:sport_mates/pages/general_purpuse/map_markers.dart';
 import 'package:sport_mates/pages/general_purpuse/maps_search.dart';
+import 'package:sport_mates/provider/data_provider.dart';
 
 import 'package:sport_mates/utils.dart';
 
@@ -136,7 +138,9 @@ class _RadiusSelectorWidgetState extends State<RadiusSelectorWidget> {
                   ],
                 ),
                 ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await Provider.of<DataProvider>(context, listen: false)
+                          .updatePosition(center);
                       Navigator.of(context).pop({radius, center});
                     },
                     child: const Text('Scegli questa posizione e raggio')),

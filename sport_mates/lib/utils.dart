@@ -16,8 +16,7 @@ List<Activity> historyActivity(
       .toList();
 }
 
-List<Activity> upcomingFilter(
-    String user, List<Activity> activities, LatLng? pos) {
+List<Activity> upcomingFilter(String user, List<Activity> activities) {
   return activities
       .where((element) =>
           element.time.isAfter(DateTime.now()) &&

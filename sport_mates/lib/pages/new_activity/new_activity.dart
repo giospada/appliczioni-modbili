@@ -184,10 +184,12 @@ class _CreateActivityWidgetState extends State<CreateActivityWidget> {
                           MaterialPageRoute(
                             builder: (context) => PosSelectorWidget(pos),
                           ),
-                        ) as LatLng;
+                        ) as LatLng?;
                         setState(() {
-                          long = result.longitude;
-                          lati = result.latitude;
+                          if (result != null) {
+                            long = result.longitude;
+                            lati = result.latitude;
+                          }
                         });
                       },
                       child: const Text('Scegli una posizione'),

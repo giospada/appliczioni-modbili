@@ -21,4 +21,6 @@ class Config {
       : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJzdHJpbmciLCJleHAiOjE3MjYxMzEwMDR9.UEUjNYSLVXXud46ujGKpkWrLcewtn5cUofpRvLkaUOs";
 
   final List<String> sports = ['running', 'basketball', 'football'];
+
+  int? goToActivity;
 }

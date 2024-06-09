@@ -125,7 +125,7 @@ class ActivityDetailsPage extends StatelessWidget {
         Provider.of<DataProvider>(context, listen: false)
             .joinActivity(id, user);
       },
-      'join'
+      'prender parte'
     ),
     _Action.leave: (
       leave,
@@ -133,14 +133,14 @@ class ActivityDetailsPage extends StatelessWidget {
         Provider.of<DataProvider>(context, listen: false)
             .leaveActivity(id, user);
       },
-      'leave'
+      'lasciare'
     ),
     _Action.delete: (
       delete,
       (context, id, _) {
         Provider.of<DataProvider>(context, listen: false).deleteActivity(id);
       },
-      'delete'
+      'eliminare'
     )
   };
 
@@ -158,7 +158,7 @@ class ActivityDetailsPage extends StatelessWidget {
     if (context.mounted) {
       if (data is Exception) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to ${azione.$3} activity')));
+            SnackBar(content: Text('Impossibile ${azione.$3} l\'attività')));
       } else {
         azione.$2(context, activityData.id, user);
         Navigator.pop(context);
@@ -183,9 +183,7 @@ class ActivityDetailsPage extends StatelessWidget {
       persistentFooterButtons: [
         Center(
           child: isParticipant
-              ? Row(
-              mainAxisAlignment: MainAxisAlignment.center ,
-              children: [
+              ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   (activityData.creator == user)
                       ? OutlinedButton(
                           onPressed: () async {
@@ -195,7 +193,7 @@ class ActivityDetailsPage extends StatelessWidget {
                             children: [
                               Icon(Icons.delete, size: 20),
                               SizedBox(width: 10),
-                              Text('Delete Activity'),
+                              Text('Elimina l\'attività'),
                             ],
                           ))
                       : OutlinedButton(
@@ -206,7 +204,7 @@ class ActivityDetailsPage extends StatelessWidget {
                             children: [
                               Icon(Icons.exit_to_app, size: 20),
                               SizedBox(width: 10),
-                              Text('Leave Activity'),
+                              Text('Lascia l\'attività'),
                             ],
                           )),
                   FutureBuilder(
@@ -230,8 +228,8 @@ class ActivityDetailsPage extends StatelessWidget {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
                                         const SnackBar(
-                                          content: Text(
-                                              'Notifica disabilitata'),
+                                          content:
+                                              Text('Notifica disabilitata'),
                                         ),
                                       );
                                     },
@@ -262,13 +260,12 @@ class ActivityDetailsPage extends StatelessWidget {
                                         setState(() {
                                           isScheduled = true;
                                         });
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              'Notifica abilitata'),
-                                        ),
-                                      );
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Notifica abilitata'),
+                                          ),
+                                        );
                                       }
                                     },
                                     icon: const Icon(Icons.notification_add));

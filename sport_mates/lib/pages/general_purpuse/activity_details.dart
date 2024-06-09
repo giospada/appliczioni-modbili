@@ -1,3 +1,4 @@
+import 'package:share_plus/share_plus.dart';
 import 'package:sport_mates/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:sport_mates/data/activity_data.dart';
@@ -64,14 +65,13 @@ class ActivityDetailsWidget extends StatelessWidget {
                         padding: const EdgeInsets.all(8.0),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
+                            color: Theme.of(context).primaryColor,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(3.0),
                             child: Icon(
                                 sportToIcon[activityData.attributes.sport],
-                                color: Colors.black,
                                 size: 40),
                           ),
                         ),

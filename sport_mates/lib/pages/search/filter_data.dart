@@ -33,16 +33,21 @@ class FilterData {
         endDate != def.endDate;
   }
 
-  bool isValidActivity(Activity activity, LatLng? pos, double radius) {
+  bool isValidActivity(Activity activity) {
     if (activity.numberOfPeople - activity.participants.length <= 0)
       return false;
     if (price && activity.attributes.price > maxPrice) return false;
-    if (pos != null && isInRatio(activity.position, pos, radius)) return false;
     if (selectedSport != Config().nullSport &&
         activity.attributes.sport != selectedSport) return false;
     if (DateTime.now().isAfter(activity.time)) return false;
     if (startDate != null && startDate!.isAfter(activity.time)) return false;
     if (endDate != null && endDate!.isBefore(activity.time)) return false;
     return true;
+  }
+
+  bool isValidActivityInsideRadius(
+      Activity activity, LatLng? pos, double radius) {
+    if (pos != null && isInRatio(activity.position, pos, radius)) return false;
+    return isValidActivity(activity);
   }
 }
