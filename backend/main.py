@@ -69,7 +69,7 @@ def create_activity(activity: schemas.ActivityCreate, db: Session = Depends(get_
     return crud.create_activity(db=db, activity=activity, username=token_data.username).toActivityBase()
 
 
-@app.get("/activities_delete", response_model=List[schemas.Activity])
+@app.get("/activities_delete", response_model=List[int])
 def get_deleted_activities(db: Session = Depends(get_db), date: Optional[datetime] = None):
     return crud.get_deleted_activities(db,date)
 
