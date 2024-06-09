@@ -49,11 +49,13 @@ class SettingsPage extends StatelessWidget {
                   builder: (context, setState) {
                     return DropdownButton<int>(
                       value: notifyBefore,
-                      items: [5, 10, 15, 20, 30, 60, null]
+                      items: [0, 5, 15, 30, 60, null]
                           .map<DropdownMenuItem<int>>((e) =>
                               DropdownMenuItem<int>(
                                 value: e,
-                                child: Text(e != null ? '$e minuti' : 'mai'),
+                                child: Text(e != null
+                                    ? (e == 0 ? 'quando inizia' : '$e minuti')
+                                    : 'mai'),
                               ))
                           .toList(),
                       onChanged: (value) {

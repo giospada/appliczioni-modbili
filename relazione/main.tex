@@ -65,7 +65,7 @@ L'applicazione comprende diverse pagine chiave:
         \item \textbf{Lista}: lista che permette di visualizzare con più dettagli gli eventi nella zona selezionata
     \end{itemize}
     \item \textbf{Creazione Attività}: Interfaccia per creare nuovi eventi sportivi.
-    \item \textbf{Storico}: Raccolta degli eventi passati a cui si è partecipato con la possibilità di aggiungere un feedback.
+    \item \textbf{Storico}: Raccolta degli eventi passati a cui si è partecipato con la possibilità di aggiungere un feedback o anche chiamato ricordo.
     \item \textbf{Ricordo}: Sezione per lasciare un messaggio di ricordo dell'attività, e aggiungerci un punteggio su quanto è stata gradita.
     \item \textbf{Visualizzazione di un'Attività e Partecipazione}: Pagina dettagliata di ogni evento, che include opzioni per iscriversi all'evento, ottenere informazioni aggiuntive e aggiungere una notifica per ricordarsi dell'evento.
 \end{itemize}
@@ -148,6 +148,7 @@ Implementa la politica Single Source of Truth, ovvero che i dati vengono caricat
 
 All'esecuzione carica il file home, che controlla se è stato salvato un authetication token valido, se sì carica la pagina Search~\ref{sec:search}, se no carica la pagina di Registrazione e Login~\ref{sec:login}. Il cambio è fatto attraverso provider che, in base al cambiamento del token sceglie quale pagine caricare.
 
+Quindi il codice della homepage è qualcosa come:
 
 \begin{figure}[h]
     \centering
@@ -181,7 +182,8 @@ Le prime pagine che si incontrano sono quelle di accesso e registrazione, queste
 \label{sec:search}
 
 Search è la pagina più complessa dell'applicazione, permette di cercare eventi sportivi nella propria zona, con possibilità d'impostare dei filtri. Supporta due modalità di visualizzazione: Vediamo il codice ad alto livello, è composto da due widget stateful, il primo \textbf{SearchPage} che è un wrapper, carica i dati da DataProvider e aggiorna \textbf{\_SearchPage} che contiene l'interfaccia della search.
-\textbf{SearchPage} è il widget root della pagine non autenticate, questo significa che quando si modificano dei dati significativi in Data Provider, questo ha aggiorna tutti i componenti sottostanti, cosa che nel nostro caso è accettabile anzi.
+\textbf{SearchPage} è il widget root della pagine autenticate, questo significa che quando si modificano dei dati significativi in Data Provider, questo aggiorna tutti i componenti sottostanti.
+
 La \textbf{\_SearchPage} contiene altri dati come i filtri, la posizione attuale, e il raggio di ricerca.
 % todo specifica che è la pagina root quando uno è autenticato quindi i dati di DataProvider sono condivisi con tutte le altre pagine 
 
@@ -196,9 +198,9 @@ La \textbf{\_SearchPage} contiene altri dati come i filtri, la posizione attuale
     \end{minipage}
 \end{figure}
 
-In search possiamo compiere varie azioni, tra cui visualizzare le attività sia come lista~\ref{fig:search_list}. Più interessante e complessa è la modalità mappa~\ref{fig:search_map}, permette di visualizzare gli eventi sia tramite la posizione, infatti cliccando su un punto allora la tab cambierà la tab associata, oppure anche facendo uno swipe sulle tab si vede la posizione dell'evento associato alla tab.
-I filtri agiscono invece su entrambe le visualizzazioni degli eventi, i filtri attualmente supportati sono il prezzo massimo il tipo di sport la data d'inizio e la data di fine.
-
+In search possiamo compiere varie azioni, tra cui visualizzare le attività sia in modalità lista~\ref{fig:search_list}, che in modalità mappa~\ref{fig:search_map}, permette di visualizzare gli eventi sia tramite la posizione.
+Infatti nella modalità mappa posiamo visualizzare gli eventi cliccando sul marker.
+I filtri agiscono invece su entrambe le visualizzazioni degli eventi.
 
 \begin{figure}[h]
     \begin{minipage}{0.32\textwidth}
@@ -218,10 +220,12 @@ I filtri agiscono invece su entrambe le visualizzazioni degli eventi, i filtri a
     \end{minipage}
 \end{figure}
 
-Di default la posizione e raggio sono preimpostati a Bologna, e 10km, ma si possono cambiare attraverso il bottone in alto a destra.
-Se viene dato l'accesso alla posizione allora la posizione attuale sarà la posizione dell'utente, altrimenti sarà la posizione di default.
-Per cambiarla si può cliccare sul bottone in alto a destra con il simbolo dell'puntatore. Si va poi su un altra pagina che permette di cambiare la posizione e il raggio di ricerca.
-Inoltre nella barra di ricerca si può filtrare per descrizione dell'attività.
+Di default la posizione e raggio sono preimpostati a Bologna o all'ultima posizione da cui è avvenuto l'ultimo accesso.
+Per cambiarla si può cliccare sul bottone in alto a destra con il simbolo dell'puntatore, questo porta ad un altra pagina che permette di cambiare la posizione e il raggio di ricerca.
+E trascinando la mappa si può cambiare la posizione e il raggio di ricerca tramite lo slider.
+Inoltre si può anche cercare una posizione tramite la barra di ricerca, o impostare quella corrente con il simbolo della posizione accanto.
+
+Oltre i filtri si può usare anche la barra di ricerca per cercare un'attività tramite la descrizione.
 
 \begin{figure}[h]
     \begin{minipage}{0.32\textwidth}
@@ -286,8 +290,8 @@ Questo promemoria verrà aggiunto tramite notifica che verrà inviata \textsf{n}
 
 \subsection{Storia}
 
-Permette di visualizzare gli eventi passati a cui si è partecipato, e di aggiungere un feedback. Inoltre mostra il feedback in quelli in cui lo si è già lasciato.
-Per aggiungere il feedback, va ad aggiornare sia il feedback locale attraverso il DataProvider, sia quello sul server.
+Permette di visualizzare gli eventi passati a cui si è partecipato con il relativo Ricordo, o di aggiungerlo in caso non lo si abbia fatto. 
+Quando aggiunge un feedback utilizza il provider per aggiornare i dati sia in locale che nel backend.
 
 
 \begin{figure}[H]
@@ -312,15 +316,6 @@ Per aggiungere il feedback, va ad aggiornare sia il feedback locale attraverso i
 \end{wrapfigure}
 Le impostazioni, mostrano informazioni sull'utente, e permettono di modificare le impostazioni che per ora è solo quanto prima dell'evento ricevere una notifica. Inoltre permette di disconnettersi.
 Le configurazioni a differenza di altre impostazioni non devono essere inserite dentro un Provider in quanto non influenzano la UI.
-
-\newpage
-\section{Glossario}
-
-
-\begin{itemize}
-    \item \label{gl:activity} \textbf{Activity o Attività}: si riferisce ad un evento, un attività sportiva organizzata da un utente.
-    \item \label{gl:feedback} \textbf{Feedback o Ricordo}: si riferisce alla creazione di un feedback o ricordo legata ad un'attività passata.
-\end{itemize}
 
 
 
