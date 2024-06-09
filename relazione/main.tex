@@ -45,7 +45,7 @@ Dart è un buon linguaggio per diverse ragioni. È stato progettato per essere s
 Inoltre, Dart offre prestazioni elevate grazie alla sua compilazione ahead-of-time (AOT) che consente di produrre codice nativo efficiente.
 
 Flutter è preferibile a React Native per alcuni motivi chiave. Prima di tutto, Flutter offre una maggiore coerenza e controllo sull'aspetto e il comportamento delle applicazioni, grazie al suo set completo di widget personalizzabili.
-Inoltre, Flutter utilizza il motore grafico Skia, che garantisce prestazioni elevate e un rendering fluido su tutte le piattaforme. 
+Inoltre, Flutter utilizza il motore grafico, che garantisce prestazioni elevate. 
 Infine, Flutter ha un supporto eccellente per lo sviluppo multi-piattaforma, permettendo di scrivere una sola volta il codice e distribuirlo su iOS, Android, web e desktop.
 
 
@@ -61,12 +61,12 @@ L'applicazione comprende diverse pagine chiave:
     \item \textbf{Signup}: Pagina di accesso creare un profilo utente.
     \item \textbf{Search}: Motore di ricerca per trovare eventi o partner sportivi nella tua zona, con possibilità d'impostare dei filtri. Supporta due modalità di visualizzazione:
     \begin{itemize}
-        \item \textbf{Mappa}: visualizza gli eventi con attraverso la loro posizione nella geografica
-        \item \textbf{Lista}: lista che permette di visualizzare con più dettagli gli eventi nella zona selezionata
+        \item \textbf{Mappa}: visualizza gli eventi attraverso la loro localizzazione sulla mappa
+        \item \textbf{Lista}: lista che permette di visualizzare con maggiori dettagli gli eventi nella zona selezionata
     \end{itemize}
     \item \textbf{Creazione Attività}: Interfaccia per creare nuovi eventi sportivi.
-    \item \textbf{Storico}: Raccolta degli eventi passati a cui si è partecipato con la possibilità di aggiungere un feedback o anche chiamato ricordo.
-    \item \textbf{Ricordo}: Sezione per lasciare un messaggio di ricordo dell'attività, e aggiungerci un punteggio su quanto è stata gradita.
+    \item \textbf{Storico}: Raccolta degli eventi passati a cui si è partecipato con la possibilità di aggiungere un feedback chiamato ricordo.
+    \item \textbf{Ricordo}: Sezione per lasciare un messaggio di ricordo dell'attività, e aggiungerci un punteggio che rappresenta il gradimento dell'evento.
     \item \textbf{Visualizzazione di un'Attività e Partecipazione}: Pagina dettagliata di ogni evento, che include opzioni per iscriversi all'evento, ottenere informazioni aggiuntive e aggiungere una notifica per ricordarsi dell'evento.
 \end{itemize}
 
@@ -114,8 +114,8 @@ Le due strutture di dati principali dell'applicazione sono definite sotto \textb
 
 
 \begin{itemize}
-    \item \textbf{Activity}~\ref{gl:activity}: contiene i dati relativi ad un evento sportivo, come il nome, la descrizione, la posizione, la data e l'ora, il numero di partecipanti, ecc.
-    \item \textbf{Feedback}~\ref{gl:feedback}': contiene i dati relativi al feedback lasciato da un utente su un'attività, come il punteggio, il messaggio e l'attività  associata. 
+    \item \textbf{Activity}: contiene i dati relativi ad un evento sportivo, come il nome, la descrizione, la posizione, la data e l'ora, il numero di partecipanti, ecc.
+    \item \textbf{Feedback}: contiene i dati relativi al feedback lasciato da un utente relativamente ad un'attività, come il punteggio, il messaggio e l'attività  associata. 
 \end{itemize}
 
 \newpage
@@ -135,7 +135,7 @@ Nell'applicazione, come visto nella sezione di struttura del codice sorgente, ne
 \end{itemize}
 
 \textbf{Activity Data} in particolare è un provider che si occupa di caricare i dati delle activity, e di salvarli in locale, così da averli offline.
-Implementa la politica Single Source of Truth, ovvero che i dati vengono caricati da un backend facendo richieste progressive (che si aggiornano rispetto all'ultima richiesta fatta) e vengono salvati in locale, così da averli offline.
+Implementa la politica Single Source of Truth, ovvero i dati vengono caricati da un backend facendo richieste progressive (che si aggiornano rispetto all'ultima richiesta fatta) e vengono salvati in locale, così da averli offline.
 
 \textbf{Auth} questo provider permette di aggiornare tutta la UI quando l'utente si autentica o si disconnette.
 
@@ -146,7 +146,7 @@ Implementa la politica Single Source of Truth, ovvero che i dati vengono caricat
 \subsubsection{Home}
 
 
-All'esecuzione carica il file home, che controlla se è stato salvato un authetication token valido, se sì carica la pagina Search~\ref{sec:search}, se no carica la pagina di Registrazione e Login~\ref{sec:login}. Il cambio è fatto attraverso provider che, in base al cambiamento del token sceglie quale pagine caricare.
+All'esecuzione carica il file home, che controlla se è stato salvato un authetication token valido, in caso affermativo carica la pagina Search~\ref{sec:search}, in caso contrario carica la pagina di Registrazione e Login~\ref{sec:login}. Il cambio è fatto attraverso provider che, in base al cambiamento del token sceglie quale pagine caricare.
 
 Quindi il codice della homepage è qualcosa come:
 
@@ -156,14 +156,14 @@ Quindi il codice della homepage è qualcosa come:
 \end{figure}
 
 
-Inoltre nella home andiamo a definire anche il DataProvider che utilizzeremo dopo.
+Inoltre nella home andiamo a definire anche il DataProvider che utilizzeremo successivamente.
 
 \newpage
 
 \subsection{Registrazione e Accesso}
 \label{sec:login}
 
-Le prime pagine che si incontrano sono quelle di accesso e registrazione, queste pagine si connettono alle api e impostano l'authetication token attraverso l'auth provider, questo fa aggiornare la home page cambiando la pagina home a SearchPage~\ref{sec:search}.
+La prima pagina visualizzata è quella di accesso e registrazione, questa pagina si connette alle API e impostano l'authetication token attraverso l'auth provider, questo aggiorna la home page cambiando la pagina home a SearchPage~\ref{sec:search}.
 
 \begin{figure}[H]
     \begin{minipage}{0.40\textwidth}
@@ -181,7 +181,7 @@ Le prime pagine che si incontrano sono quelle di accesso e registrazione, queste
 \subsection{Search}
 \label{sec:search}
 
-Search è la pagina più complessa dell'applicazione, permette di cercare eventi sportivi nella propria zona, con possibilità d'impostare dei filtri. Supporta due modalità di visualizzazione: Vediamo il codice ad alto livello, è composto da due widget stateful, il primo \textbf{SearchPage} che è un wrapper, carica i dati da DataProvider e aggiorna \textbf{\_SearchPage} che contiene l'interfaccia della search.
+Search è la pagina più complessa dell'applicazione, permette di cercare eventi sportivi nella propria zona, con possibilità d'impostare dei filtri. Supporta due modalità di visualizzazione. Il codice ad alto livello, è composto da due widget stateful, il primo \textbf{SearchPage} che è un wrapper, carica i dati da DataProvider e aggiorna \textbf{\_SearchPage} che contiene l'interfaccia della search.
 \textbf{SearchPage} è il widget root della pagine autenticate, questo significa che quando si modificano dei dati significativi in Data Provider, questo aggiorna tutti i componenti sottostanti.
 
 La \textbf{\_SearchPage} contiene altri dati come i filtri, la posizione attuale, e il raggio di ricerca.
@@ -199,7 +199,7 @@ La \textbf{\_SearchPage} contiene altri dati come i filtri, la posizione attuale
 \end{figure}
 
 In search possiamo compiere varie azioni, tra cui visualizzare le attività sia in modalità lista~\ref{fig:search_list}, che in modalità mappa~\ref{fig:search_map}, permette di visualizzare gli eventi sia tramite la posizione.
-Infatti nella modalità mappa posiamo visualizzare gli eventi cliccando sul marker.
+Infatti nella modalità mappa posiamo visualizzare gli eventi tramite il marker.
 I filtri agiscono invece su entrambe le visualizzazioni degli eventi.
 
 \begin{figure}[h]
@@ -220,10 +220,10 @@ I filtri agiscono invece su entrambe le visualizzazioni degli eventi.
     \end{minipage}
 \end{figure}
 
-Di default la posizione e raggio sono preimpostati a Bologna o all'ultima posizione da cui è avvenuto l'ultimo accesso.
-Per cambiarla si può cliccare sul bottone in alto a destra con il simbolo dell'puntatore, questo porta ad un altra pagina che permette di cambiare la posizione e il raggio di ricerca.
-E trascinando la mappa si può cambiare la posizione e il raggio di ricerca tramite lo slider.
-Inoltre si può anche cercare una posizione tramite la barra di ricerca, o impostare quella corrente con il simbolo della posizione accanto.
+Di default la posizione e raggio sono preimpostati su Bologna o la posizione da cui è avvenuto l'accesso più recente.
+Per cambiarla si può cliccare sul bottone in alto a destra con il simbolo dell'puntatore, questo porta ad un altra pagina che permette di modificare la posizione e il raggio di ricerca.
+Trascinando la mappa si può cambiare la posizione e il raggio di ricerca tramite lo slider.
+Inoltre è possibile utilizzare anche cercare una posizione tramite la barra di ricerca, o impostare quella corrente con il simbolo della posizione accanto.
 
 Oltre i filtri si può usare anche la barra di ricerca per cercare un'attività tramite la descrizione.
 
@@ -247,11 +247,11 @@ Oltre i filtri si può usare anche la barra di ricerca per cercare un'attività 
 
 \subsection{Aggiungi attività}
 
-La creazione nel creare un attività sportiva sono diverse pagine da completare per creare un evento sportivo:
+La creazione nel creare un attività sportiva richiede la compilazione di diverse pagine:
 \begin{itemize}
     \item \textbf{Posizione}: permette di selezionare la posizione dell'evento attraverso una mappa.
     \item \textbf{Data}: permette di selezionare la data e l'ora dell'evento.
-    \item \textbf{Dettagli}: permette di inserire una descrizione dell'evento, lo sport, il numero di partecipanti e il prezzo.
+    \item \textbf{Dettagli}: permette di inserire una descrizione dell'evento, la disciplina sportiva, il numero di partecipanti e il prezzo.
 \end{itemize}
 
 
@@ -273,7 +273,7 @@ La creazione nel creare un attività sportiva sono diverse pagine da completare 
 \subsection{Partecipa ad un'attività}
 
 Per partecipare ad un'attività basta cliccare sul bottone partecipa, e si verrà aggiunti alla lista dei partecipanti. Inoltre si può aggiungere un promemoria per l'evento.
-Questo promemoria verrà aggiunto tramite notifica che verrà inviata \textsf{n} minuti prima dell'evento, dove \textsf{n} sono i minuti definiti nelle impostazioni.
+Questo promemoria consiste in una notifica che verrà inviata \textsf{n} minuti prima dell'evento, dove \textsf{n} sono i minuti definiti nelle impostazioni.
 
 
 \begin{figure}[H]
@@ -290,8 +290,8 @@ Questo promemoria verrà aggiunto tramite notifica che verrà inviata \textsf{n}
 
 \subsection{Storia}
 
-Permette di visualizzare gli eventi passati a cui si è partecipato con il relativo Ricordo, o di aggiungerlo in caso non lo si abbia fatto. 
-Quando aggiunge un feedback utilizza il provider per aggiornare i dati sia in locale che nel backend.
+Permette di visualizzare gli eventi passati a cui si è partecipato con il relativo Ricordo, o di aggiungerlo in caso non lo si abbia ancora fatto. 
+Quando aggiunge un feedback utilizza il DataProvider per aggiornare i dati sia in locale che nel backend.
 
 
 \begin{figure}[H]
@@ -314,13 +314,8 @@ Quando aggiunge un feedback utilizza il provider per aggiornare i dati sia in lo
     \center
     \includegraphics[width=0.5\linewidth]{img/settings.png}
 \end{wrapfigure}
-Le impostazioni, mostrano informazioni sull'utente, e permettono di modificare le impostazioni che per ora è solo quanto prima dell'evento ricevere una notifica. Inoltre permette di disconnettersi.
+Le impostazioni, mostrano informazioni sull'utente, e permettono di modificare quanto prima dell'evento ricevere una notifica. Inoltre permette di disconnettersi dall'account e quindi eliminare anche i dati in locale.
 Le configurazioni a differenza di altre impostazioni non devono essere inserite dentro un Provider in quanto non influenzano la UI.
-
-\newpage
-
-\subsection{}
-
 
 
 \end{document}
