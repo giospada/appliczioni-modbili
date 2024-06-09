@@ -115,7 +115,7 @@ Le due strutture di dati principali dell'applicazione sono definite sotto \textb
 
 \begin{itemize}
     \item \textbf{Activity}~\ref{gl:activity}: contiene i dati relativi ad un evento sportivo, come il nome, la descrizione, la posizione, la data e l'ora, il numero di partecipanti, ecc.
-    \item \textbf{Feedback}~\ref{gl:feedback}': contiene i dati relativi al feedback lasciato da un utente su un'attività, come il punteggio, il messaggio, ecc. 
+    \item \textbf{Feedback}~\ref{gl:feedback}': contiene i dati relativi al feedback lasciato da un utente su un'attività, come il punteggio, il messaggio e l'attività  associata. 
 \end{itemize}
 
 \newpage
@@ -127,7 +127,7 @@ Le due strutture di dati principali dell'applicazione sono definite sotto \textb
 \end{wrapfigure}
 Un provider in Flutter è una classe che gestisce e fornisce dati e stato all'applicazione, facilitando la separazione tra logica di business e interfaccia utente. Questo approccio migliora la leggibilità e la manutenzione del codice. Il provider viene inserito nel widget tree e consente a ogni widget di accedere e reagire agli aggiornamenti dello stato. Utilizzando il provider, si può garantire una gestione efficiente e reattiva dei dati, poiché i widget si aggiornano automaticamente quando il provider notifica un cambiamento di stato. 
 
-Nell'applicazione come visto nella sezione di struttura del codice sorgente ne abbiamo due:
+Nell'applicazione, come visto nella sezione di struttura del codice sorgente, ne abbiamo due:
 
 \begin{itemize}
     \item \textbf{Activity Data}: specifica i metodi e i dati per caricare, modificare ed eliminare i dati relativi alle Activity~\ref{gl:activity}
@@ -148,7 +148,6 @@ Implementa la politica Single Source of Truth, ovvero che i dati vengono caricat
 
 All'esecuzione carica il file home, che controlla se è stato salvato un authetication token valido, se sì carica la pagina Search~\ref{sec:search}, se no carica la pagina di Registrazione e Login~\ref{sec:login}. Il cambio è fatto attraverso provider che, in base al cambiamento del token sceglie quale pagine caricare.
 
-Quindi il codice della homepage è qualcosa come:
 
 \begin{figure}[h]
     \centering
@@ -197,24 +196,59 @@ La \textbf{\_SearchPage} contiene altri dati come i filtri, la posizione attuale
     \end{minipage}
 \end{figure}
 
+In search possiamo compiere varie azioni, tra cui visualizzare le attività sia come lista~\ref{fig:search_list}. Più interessante e complessa è la modalità mappa~\ref{fig:search_map}, permette di visualizzare gli eventi sia tramite la posizione, infatti cliccando su un punto allora la tab cambierà la tab associata, oppure anche facendo uno swipe sulle tab si vede la posizione dell'evento associato alla tab.
+I filtri agiscono invece su entrambe le visualizzazioni degli eventi, i filtri attualmente supportati sono il prezzo massimo il tipo di sport la data d'inizio e la data di fine.
+
+
 \begin{figure}[h]
     \begin{minipage}{0.32\textwidth}
         \centering
+        \label{fig:search:map}
         \includegraphics[width=1\linewidth]{img/search_map_page.png}
     \end{minipage}
     \begin{minipage}{0.32\textwidth}
         \centering
+        \label{fig:filter}
         \includegraphics[width=1\linewidth]{img/filter.png}
     \end{minipage}
     \begin{minipage}{0.32\textwidth}
+        \label{fig:search_list}
         \centering
+        \includegraphics[width=1\linewidth]{img/Search.png}
+    \end{minipage}
+\end{figure}
+
+Di default la posizione e raggio sono preimpostati a Bologna, e 10km, ma si possono cambiare attraverso il bottone in alto a destra.
+Se viene dato l'accesso alla posizione allora la posizione attuale sarà la posizione dell'utente, altrimenti sarà la posizione di default.
+Per cambiarla si può cliccare sul bottone in alto a destra con il simbolo dell'puntatore. Si va poi su un altra pagina che permette di cambiare la posizione e il raggio di ricerca.
+Inoltre nella barra di ricerca si può filtrare per descrizione dell'attività.
+
+\begin{figure}[h]
+    \begin{minipage}{0.32\textwidth}
+        \centering
+        \label{fig:search_map}
+        \includegraphics[width=1\linewidth]{img/search_map.png}
+    \end{minipage}
+    \begin{minipage}{0.32\textwidth}
+        \centering
+        \label{fig:select_radius}
+        \includegraphics[width=1\linewidth]{img/select_radius.png}
+    \end{minipage}
+    \begin{minipage}{0.32\textwidth}
+        \centering
+        \label{fig:select_radius}
         \includegraphics[width=1\linewidth]{img/search_activity.png}
     \end{minipage}
 \end{figure}
 
 \subsection{Aggiungi attività}
 
-La creazione nel creare un attività sportiva è molto semplice, si compone di un form che permette di inserire i dati dell'attività, e di un bottone per confermare l'aggiunta.
+La creazione nel creare un attività sportiva sono diverse pagine da completare per creare un evento sportivo:
+\begin{itemize}
+    \item \textbf{Posizione}: permette di selezionare la posizione dell'evento attraverso una mappa.
+    \item \textbf{Data}: permette di selezionare la data e l'ora dell'evento.
+    \item \textbf{Dettagli}: permette di inserire una descrizione dell'evento, lo sport, il numero di partecipanti e il prezzo.
+\end{itemize}
 
 
 \begin{figure}[H]
@@ -235,6 +269,7 @@ La creazione nel creare un attività sportiva è molto semplice, si compone di u
 \subsection{Partecipa ad un'attività}
 
 Per partecipare ad un'attività basta cliccare sul bottone partecipa, e si verrà aggiunti alla lista dei partecipanti. Inoltre si può aggiungere un promemoria per l'evento.
+Questo promemoria verrà aggiunto tramite notifica che verrà inviata \textsf{n} minuti prima dell'evento, dove \textsf{n} sono i minuti definiti nelle impostazioni.
 
 
 \begin{figure}[H]
@@ -268,7 +303,6 @@ Per aggiungere il feedback, va ad aggiornare sia il feedback locale attraverso i
 \end{figure}
 
 
-\newpage
 \subsection{Impostazioni}
 
 \begin{wrapfigure}{r}{0.50\textwidth}
