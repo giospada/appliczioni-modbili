@@ -40,6 +40,7 @@ L'obiettivo principale è quello di facilitare la connessione tra appassionati d
 
 - Semplice e produttivo
 - Sintassi chiara e coerente
+- Null safety
 
 </div>
 <div class="">
@@ -48,8 +49,8 @@ L'obiettivo principale è quello di facilitare la connessione tra appassionati d
 
 <div class="small">
 
-- Maggiore coerenza e controllo sull'aspetto e comportamento delle app
-- Supporto eccellente per lo sviluppo multi-piattaforma 
+- Supporto eccellente per lo sviluppo multi-piattaforma, componeti definiti in maniera dichiarativa
+- principali librerie utilizzate: provider, flutter_secure_storage, flutter_map, flutter_local_notifications
 
 </div>
 </div>
@@ -186,6 +187,15 @@ Pagina complessa che permette di cercare eventi sportivi con filtri e due modali
 ![bg right w:98%](img/search_map_page.png)
 ![bg rigt w:98%](img/filter.png)
 ![bg right w:98%](img/Search.png)
+
+---
+
+### Cambia raggio 
+
+Questa activity serve per cambiare il raggio di ricerca della search.
+
+![bg right w:98%](img/flutter_05.png)
+![bg right w:98%](img/select_radius.png)
 
 ---
 

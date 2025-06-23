@@ -115,7 +115,7 @@ script in js for googlemaps downlaod locations
 
 possible_description=[
   "Vivi l'emozione dello sport al {location}! Un evento imperdibile ti aspetta il {data} alle {ora}. Biglietti disponibili a partire da {prezzo}. Non perdere questa fantastica occasione di divertimento e competizione!",
-  "Scopri i migliori talenti locali in azione! Partecipa all'evento sportivo al {location}, in programma il {data}. Le competizioni iniziano alle {ora}, con biglietti a soli {prezzo}. Un'esperienza da non perdere per gli appassionati di ogni età.",
+  "Scopri i migliori talenti locali in azione! Partecipa all'evento sportivo al {location}, in programma il {data}. Le competizioni iniziano alle {ora}, con biglietti a soli {prezzo}. Un'esperienza da non perdere per gli appassionati di ogni eta.",
   "Tuffati nel cuore dell'azione con la nostra competizione di {sport}! L'appuntamento è al {location} il {data}, a partire dalle {ora}. Sostieni i tuoi favoriti con biglietti a {prezzo}. Vivi l'adrenalina e il divertimento!",
   "Partecipa a un evento che va oltre lo sport: unisciti a noi per {sport} con scopo benefico. Raccogliamo fondi al {location} il {data}, dalle {ora}. Iscrizione a soli {prezzo}. Ogni contributo fa la differenza!",
   "Non perderti l'appuntamento con lo sport al {location}! Competizioni avvincenti ti aspettano il {data} a partire dalle {ora}. Biglietti da {prezzo}. Emozione e passione in un evento unico.",
@@ -128,7 +128,7 @@ possible_description=[
 for token in tokens:
     for _ in range(NUMBER_OF_ACTIVITY):
         sport = random.choice(["basketball", "football", "running"])
-        time = datetime.now() + timedelta(days=random.randint(0, 7), hours=random.randint(8, 19))
+        time = datetime.now() + timedelta(days=random.randint(0, 7), hours=random.randint(9, 20))
         # position should be replaced with actual data
         choosed = random.randint(0,len(positions)-1)
         position = {"lat": positions[choosed][0], "long": positions[choosed][1]}
@@ -141,7 +141,7 @@ for token in tokens:
                 ora=time.strftime("%H:%M"),
                 prezzo=f"${price}",
                 sport=sport  # Optional, use only if needed
-                )
+            )
         create_activity(token, description, time.isoformat(), position, attributes, numberOfPeople)
 
 
